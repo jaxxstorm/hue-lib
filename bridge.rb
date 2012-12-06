@@ -1,12 +1,19 @@
-module Hue
+require 'digest/md5'
+require 'uuid'
+require 'singleton'
 
+module Hue
   class Bridge
+    include Singleton
+
     attr_accessor :light_id
 
+    # Remove
     def self.shared
-      @shared ||= Bridge.new
+      self.instance
     end
 
+    # Remove
     def self.method_missing(method, *args, &block)
       if args.empty?
         self.shared.send method
@@ -15,12 +22,34 @@ module Hue
       end
     end
 
-    def initialize(light_num = nil)
-      self.light_id = light_num.to_s
+    # Move to APP class
+    def self.register(host = BASE)
+      # TODO: Look for defult config.
+      puts "Please press the button on bridge before continuing."
+      puts "Once done, press Enter to continue."
+      gets
+      secret = Digest::MD5.hexdigest(UUID.generate) # one time UUID
+      puts "Registering app...(#{secret})"
+      config = Hue::Config.new(host, secret)
+      instance.create(
+        URI.parse(config.base_uri),
+        {"username" => config.base_uri, "devicetype" => Hue.device_type}
+      )
+      config.write
     end
 
-    def uri(*args)
-      URI [BASE, UUID, args].flatten.reject{|x| x.to_s.strip == ''}.join('/')
+    # Move to APP class
+    def self.remove
+      config = Config.default
+      instance.delete(
+        URI.parse(config.base_uri),
+        {"username" => config.identifier}
+      )
+      config.delete
+    end
+
+    def initialize(light_num = nil)
+      self.light_id = light_num.to_s
     end
 
     def status
@@ -59,11 +88,38 @@ module Hue
       ids.each{|x| remove_schedule x}
     end
 
+    def uri(*args)
+      URI [BASE, UUID, args].flatten.reject{|x| x.to_s.strip == ''}.join('/')
+    end
+
+    public
+
+    def update(url, settings = {})
+      request = Net::HTTP::Put.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
+      request.body = settings.to_json
+      display Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
+    end
+
+    def delete(url, settings = {})
+      request = Net::HTTP::Delete.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
+      request.body = settings.to_json
+      display Net::HTTP.new(url.host, url.port).start{|http| http.request(request)}
+    end
+
+    def create(url, settings = {})
+      request = Net::HTTP::Post.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
+      request.body = settings.to_json
+      display Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
+    end
+
+    private
+
     def display(response = nil)
       if response and response.code.to_s != '200'
         puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
         false
       else
+        puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
         true
       end
     end
@@ -76,17 +132,5 @@ module Hue
       update uri('lights', light_id), settings if light_id
     end
 
-    def update(url, settings = {})
-      request = Net::HTTP::Put.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
-      request.body = settings.to_json
-      display Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
-    end
-
-    def delete(url)
-      request = Net::HTTP::Delete.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
-      display Net::HTTP.new(url.host, url.port).start{|http| http.request(request)}
-    end
-
   end
-
-end # Hue
+end

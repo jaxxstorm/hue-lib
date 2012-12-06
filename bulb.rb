@@ -1,5 +1,4 @@
 module Hue
-
   class Bulb
 
     attr_accessor :id, :stash, :options
@@ -321,7 +320,6 @@ module Hue
       restore!
     end
 
-
     # Experimental Sunrise/Sunset  action
     # this will transition from off and warm light to on and daytime light
     # in a curve that mimics the actual sunrise.
@@ -365,7 +363,6 @@ module Hue
       end
       off
     end
-
 
     SUN_STEPS = [ 1.5, 2, 3, 1, 4, 2.5 ]
     SUN_TIMES = [ 3,   3, 3, 1, 2, 1]
@@ -418,4 +415,4 @@ module Hue
     end
 
   end
-end # Hue
+end
