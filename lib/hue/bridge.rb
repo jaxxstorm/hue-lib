@@ -9,16 +9,11 @@ module Hue
     attr_accessor :light_id
 
     # Remove
-    def self.shared
-      self.instance
-    end
-
-    # Remove
     def self.method_missing(method, *args, &block)
       if args.empty?
-        self.shared.send method
+        self.instance.send method
       else
-        self.shared.send method, *args
+        self.instance.send method, *args
       end
     end
 
@@ -53,7 +48,7 @@ module Hue
     end
 
     def status
-      JSON.parse Net::HTTP.get(Bridge.shared.uri)
+      JSON.parse Net::HTTP.get(Bridge.instance.uri)
     end
 
     def lights
@@ -116,9 +111,11 @@ module Hue
 
     def display(response = nil)
       if response and response.code.to_s != '200'
+        # Output to logger
         puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
         false
       else
+        # Output to logger
         puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
         true
       end

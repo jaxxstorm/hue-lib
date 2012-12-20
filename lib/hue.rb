@@ -3,8 +3,6 @@ BASE    = 'http://10.10.10.20/api'
 # UUID    = 'd79713a3433df3d972ba7c22cb1cc23e'
 # Digest::MD5.hexdigest('aa4f6bc0-2045-0130-8cf0-0018de9ecdd0')
 
-DEVICE_TYPE = "RubyHue"
-
 require 'net/http'
 require 'json'
 require 'matrix'
@@ -15,12 +13,33 @@ RGB_MATRIX = Matrix[
   [0.12942207487871885, 0.19839858329512317, 2.0280912276039635]
 ]
 
-load 'bridge.rb'
-load 'bulb.rb'
-load 'config.rb'
+require 'hue/bridge.rb'
+require 'hue/bulb.rb'
+require 'hue/config.rb'
 
 module Hue
+
+  DEVICE_TYPE = "RubyHue"
+
   def self.device_type
     DEVICE_TYPE
   end
+
+  class Error < StandardError
+    attr_accessor :original_error
+
+    def initialize(message, original_error = nil)
+      super(message)
+      @original_error = original_error
+    end
+
+    def to_s
+      if @original_error.nil?
+        super
+      else
+        "#{super}\nCause: #{@original_error.to_s}"
+      end
+    end
+  end
+
 end
