@@ -6,8 +6,6 @@ module Hue
   class Bridge
     include Singleton
 
-    attr_accessor :light_id
-
     # Remove
     def self.method_missing(method, *args, &block)
       if args.empty?
@@ -43,8 +41,9 @@ module Hue
       config.delete
     end
 
-    def initialize(light_num = nil)
-      self.light_id = light_num.to_s
+    public
+
+    def initialize()
     end
 
     def status
@@ -119,14 +118,6 @@ module Hue
         puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
         true
       end
-    end
-
-    def update_state(settings)
-      update uri('lights', light_id, 'state'), settings if light_id
-    end
-
-    def update_base(settings)
-      update uri('lights', light_id), settings if light_id
     end
 
   end
