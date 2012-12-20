@@ -1,0 +1,4 @@
+---
+default:
+  base_uri: http://localhost/api
+  identifier: test_identifier
