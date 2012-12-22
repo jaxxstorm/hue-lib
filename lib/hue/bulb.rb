@@ -1,6 +1,8 @@
 module Hue
   class Bulb
 
+    public
+
     attr_accessor :id, :stash, :options
 
     def initialize(light_num, options = {})
@@ -18,11 +20,6 @@ module Hue
 
     def [](item)
       states[item.to_s]
-    end
-
-    def update(settings = {})
-      puts @options.merge(settings).inspect
-      Bridge.update Bridge.uri('lights', id, 'state'), @options.merge(settings)
     end
 
     def name
@@ -318,6 +315,14 @@ module Hue
         sleep delay
       end
       restore!
+    end
+
+    private
+
+    def update(settings = {})
+      puts @options.merge(settings).inspect
+      # TODO: Move singleton to instance variable
+      Bridge.set_light_state(id, @options.merge(settings))
     end
 
     # Experimental Sunrise/Sunset  action

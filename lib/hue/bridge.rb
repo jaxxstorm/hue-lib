@@ -1,19 +1,19 @@
 require 'digest/md5'
 require 'uuid'
-require 'singleton'
+# require 'singleton'
 
 module Hue
   class Bridge
-    include Singleton
+    # include Singleton
 
-    # Remove
-    def self.method_missing(method, *args, &block)
-      if args.empty?
-        self.instance.send method
-      else
-        self.instance.send method, *args
-      end
-    end
+    # # Remove
+    # def self.method_missing(method, *args, &block)
+    #   if args.empty?
+    #     self.instance.send method
+    #   else
+    #     self.instance.send method, *args
+    #   end
+    # end
 
     # Move to APP class
     def self.register(host = BASE)
@@ -43,32 +43,34 @@ module Hue
 
     public
 
-    def initialize()
+    attr_reader :setup
+
+    def initialize(setup = Hue::Config.default)
+      @setup = setup
     end
 
     def status
-      JSON.parse Net::HTTP.get(Bridge.instance.uri)
+      index(uri)
     end
 
     def lights
-      status['lights']
+      index(uri('lights'))
     end
 
-    def identities
-      Hash[lights.map{|k, v| [k, v['name']] }]
+    def light_names
+      lights.map { |k,v| "#{k}. #{v['name']}" }.join("\n")
+    end
+
+    def config
+      index(uri('config'))
+    end
+
+    def schedules
+      index(uri('schedules'))
     end
 
     def bulbs
       @bulbs ||= lights.keys.map{|b| Bulb.new b}
-    end
-
-    def reload
-      @bulbs = nil
-      self
-    end
-
-    def schedules
-      status['schedules']
     end
 
     def remove_schedule(schedule_id)
@@ -82,11 +84,24 @@ module Hue
       ids.each{|x| remove_schedule x}
     end
 
-    def uri(*args)
-      URI [BASE, UUID, args].flatten.reject{|x| x.to_s.strip == ''}.join('/')
+    def set_light_state(id, state)
+      update(uri('lights', id, 'state'), state)
     end
 
-    public
+    private
+
+    def light_state
+
+    end
+
+    def uri(*args)
+      URI [setup.base_uri, setup.identifier, args].flatten.reject{|x| x.to_s.strip == ''}.join('/')
+    end
+
+    def index(url)
+      json = Net::HTTP.get(url)
+      JSON.parse(json)
+    end
 
     def update(url, settings = {})
       request = Net::HTTP::Put.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
@@ -105,8 +120,6 @@ module Hue
       request.body = settings.to_json
       display Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
     end
-
-    private
 
     def display(response = nil)
       if response and response.code.to_s != '200'

@@ -1,0 +1,27 @@
+{ 
+  "name" : "Philips hue",
+  "mac" : "00:17:88:09:00:00",
+  "dhcp" : true,
+  "ipaddress" : "10.255.255.44",
+  "netmask" : "255.255.255.0",
+  "gateway" : "10.255.255.1",
+  "proxyaddress" : "",
+  "proxyport" : 0,
+  "UTC" : "2012-11-02T18:34:35",
+  "whitelist" : { 
+    "0123456789abdcef0123456789abcdef" : { 
+      "last use date" : "2012-11-02T18:34:35",
+      "create date" : "2012-11-01T21:04:48",
+      "name" : "iPhone 5"
+    }
+  },
+  "swversion" : "01003542",
+  "swupdate" : { 
+    "updatestate" : 0,
+    "url" : "",
+    "text" : "",
+    "notify" : false
+  },
+  "linkbutton" : false,
+  "portalservices" : false
+}
