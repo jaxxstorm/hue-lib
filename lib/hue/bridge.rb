@@ -17,7 +17,7 @@ module Hue
 
     # Move to APP class
     def self.register(host = BASE)
-      # TODO: Look for defult config.
+      # TODO: Look for default config.
       puts "Please press the button on bridge before continuing."
       puts "Once done, press Enter to continue."
       gets
@@ -43,10 +43,10 @@ module Hue
 
     public
 
-    attr_reader :setup
+    attr_reader :hue_config
 
-    def initialize(setup = Hue::Config.default)
-      @setup = setup
+    def initialize(hue_config = Hue.config)
+      @hue_config = hue_config
     end
 
     def status
@@ -90,12 +90,8 @@ module Hue
 
     private
 
-    def light_state
-
-    end
-
     def uri(*args)
-      URI [setup.base_uri, setup.identifier, args].flatten.reject{|x| x.to_s.strip == ''}.join('/')
+      URI [hue_config.base_uri, hue_config.identifier, args].flatten.reject{|x| x.to_s.strip == ''}.join('/')
     end
 
     def index(url)

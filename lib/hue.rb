@@ -25,6 +25,10 @@ module Hue
     DEVICE_TYPE
   end
 
+  def self.config
+    Hue::Config.default
+  end
+
   class Error < StandardError
     attr_accessor :original_error
 
