@@ -70,19 +70,20 @@ module Hue
     end
 
     def bulbs
-      @bulbs ||= lights.keys.map{|b| Bulb.new b}
+      # puts status['lights'].inspect
+      @bulbs ||= lights.keys.map { |b| Bulb.new(b) }
     end
 
-    def remove_schedule(schedule_id)
-      delete uri('schedules', schedule_id)
-      puts "Removed schedule #{schedule_id}"
-    end
+    # def remove_schedule(schedule_id)
+    #   delete uri('schedules', schedule_id)
+    #   puts "Removed schedule #{schedule_id}"
+    # end
 
-    def remove_all_schedules
-      ids = schedules.keys.map(&:to_i).sort.reverse
-      puts "Removing #{ids.size} schedule#{'s' if ids.size != 1}..."
-      ids.each{|x| remove_schedule x}
-    end
+    # def remove_all_schedules
+    #   ids = schedules.keys.map(&:to_i).sort.reverse
+    #   puts "Removing #{ids.size} schedule#{'s' if ids.size != 1}..."
+    #   ids.each{|x| remove_schedule x}
+    # end
 
     def set_light_state(id, state)
       update(uri('lights', id, 'state'), state)

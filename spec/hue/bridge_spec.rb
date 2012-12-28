@@ -53,6 +53,16 @@ describe Hue::Bridge do
       with_fake_request(:schedules)
       bridge.schedules.should == api_reply(:schedules)
     end
+
+    it 'should return instance of all the bulbs' do
+      with_fake_request(:lights)
+      bulbs = bridge.bulbs
+      bulbs.size.should == 3
+      bulbs.each do |bulb|
+        bulb.should be_a(Hue::Bulb)
+      end
+    end
+
   end
 
 end
