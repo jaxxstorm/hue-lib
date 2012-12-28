@@ -1,0 +1,28 @@
+{ 
+  "state" : { 
+    "on" : false,
+    "bri" : 146,
+    "hue" : 13234,
+    "sat" : 208,
+    "xy" : [ "0.5090", "0.4149" ],
+    "ct" : 459,
+    "alert" : "none",
+    "effect" : "none",
+    "colormode" : "ct",
+    "reachable" : true
+  },
+  "type" : "Extended color light",
+  "name" : "Living",
+  "modelid" : "LCT001",
+  "swversion" : "65003148",
+  "pointsymbol" : { 
+    "1" : "none",
+    "2" : "none",
+    "3" : "none",
+    "4" : "none",
+    "5" : "none",
+    "6" : "none",
+    "7" : "none",
+    "8" : "none"
+  }
+}

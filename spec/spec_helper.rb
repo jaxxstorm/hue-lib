@@ -31,3 +31,14 @@ end
 def api_reply(named)
   JSON.parse(api_reply_json(named))
 end
+
+def with_fake_update(named, update = {})
+  stub = stub_request(:put, "http://localhost/api/test_identifier/#{named.to_s}").
+    with(:body => update.to_json).
+    to_return(:status => 200, :body => update.to_json, :headers => {})
+
+  if block_given?
+    yield
+    stub.should have_been_requested
+  end
+end

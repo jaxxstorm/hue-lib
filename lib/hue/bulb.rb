@@ -3,23 +3,31 @@ module Hue
 
     public
 
-    attr_accessor :id, :stash, :options
+    attr_reader :id, :bridge
+    attr_accessor :options
 
-    def initialize(light_num, options = {})
-      self.id       = light_num
-      self.options  = options
+    def initialize(bridge, light_id, options = {})
+      @bridge = bridge
+      @id = light_id
+      @options = options
     end
 
-    def status
-      JSON.parse Net::HTTP.get(Bridge.uri('lights', id))
+    def refresh!
+      @status = bridge.get_light_state(id)
     end
 
-    def states
+    def info
+      status.select do |k, value|
+        value.is_a?(String)
+      end
+    end
+
+    def state
       status['state']
     end
 
     def [](item)
-      states[item.to_s]
+      state[item.to_s]
     end
 
     def name
@@ -27,7 +35,7 @@ module Hue
     end
 
     def name=(_name)
-      Bridge.update uri('lights', light_id), name: _name
+      update(name: _name)
     end
 
     def on?
@@ -39,12 +47,12 @@ module Hue
     end
 
     def on
-      update on: true
+      update(on: true)
       on?
     end
 
     def off
-      update on: false
+      update(on: false)
       off?
     end
 
@@ -52,28 +60,80 @@ module Hue
       self[:bri]
     end
 
+    alias :bri :brightness
+
     def brightness=(bri)
-      update bri: bri
+      update(bri: bri)
       brightness
     end
+
+    alias :bri= :brightness=
 
     def hue
       self[:hue]
     end
 
+    HUE_MAX = 65536.0
+    HUE_DEGREES = 360
+    HUE_SCALE = HUE_MAX / HUE_DEGREES
+
     def hue=(_hue)
-      _hue = (_hue * (65536.0 / 360)).to_i
-      update hue: _hue
+      _hue = (_hue * HUE_SCALE).to_i
+      update(hue: _hue)
       hue
     end
 
-    def sat
+    def saturation
       self[:sat]
     end
 
-    def sat=(_sat)
-      update sat: _sat
+    alias :sat :saturation
+
+    def saturation=(_sat)
+      update(sat: _sat)
       sat
+    end
+
+    alias :sat= :saturation=
+
+    def color_temperature
+      self[:ct]
+    end
+
+    alias :ct :color_temperature
+
+    def color_temperature=(_ct)
+      update(ct: [[_ct, 154].max, 500].min)
+      colortemp
+    end
+
+    alias :ct= :color_temperature=
+
+    def color_mode
+      self[:colormode]
+    end
+
+    alias :colormode :color_mode
+
+    def blinking?
+      !solid?
+    end
+
+    def solid?
+      'none' == self['alert']
+    end
+
+    def blink
+      update(alert: 'lselect')
+    end
+
+    def solid
+      update(alert: 'none')
+    end
+
+    def flash
+      update(alert: 'select')
+      update(alert: 'none')
     end
 
     def transition_time
@@ -86,40 +146,9 @@ module Hue
       self.options[:transitiontime] = (time * 10).to_i
     end
 
-    def colortemp
-      self[:ct]
-    end
-    alias :ct :colortemp
-
-    def colortemp=(_ct)
-      update ct: [[_ct, 154].max, 500].min
-      colortemp
-    end
-    alias :ct= :colortemp=
-
-    def colormode
-      self[:colormode]
-    end
-
-    def blinking?
-      !!(self['alert'] =~ /l?select/)
-    end
-
-    def blink(start = true)
-      update(alert: (start ? 'lselect' : 'none'))
-    end
-
-    def solid
-      update alert: 'none'
-    end
-
-    def flash
-      update alert: 'select'
-      update alert: 'none'
-    end
+    protected
 
     def settings
-      state = states
       options.merge case state['colormode']
                     when 'ct'
                       {'ct' => state['ct']}
@@ -196,7 +225,7 @@ module Hue
     end
 
     def xyz
-      vals = states['xy']
+      vals = state['xy']
       vals + [1 - vals.first - vals.last]
     end
 
@@ -209,11 +238,11 @@ module Hue
     end
 
     def hue_in_degrees
-      self['hue'].to_f / (65536.0 / 360)
+      self['hue'].to_f / HUE_SCALE
     end
 
     def hue_as_decimal
-      hue_in_degrees / 360
+      hue_in_degrees / HUE_DEGREES
     end
 
     def sat_as_decimal
@@ -280,24 +309,9 @@ module Hue
             (red - green) / d + 4
           end * 60  # / 6 * 360
 
-      h = (h * (65536.0 / 360)).to_i
+      h = (h * HUE_SCALE).to_i
       update hue: h, sat: s.to_i#, bri: l.to_i
       [h, s, 1.0]
-    end
-
-    def stash!
-      self.stash ||= settings
-    end
-
-    def restore!
-      if stash
-        update stash
-        unstash!
-      end
-    end
-
-    def unstash!
-      self.stash = nil
     end
 
     def candle(repeat = 15)
@@ -319,10 +333,31 @@ module Hue
 
     private
 
+    def stash!
+      @stash ||= settings
+    end
+
+    def restore!
+      if stash
+        update(@stash)
+        unstash!
+      end
+    end
+
+    def unstash!
+      @stash = nil
+    end
+
+    def status
+      @status || refresh!
+    end
+
     def update(settings = {})
-      puts @options.merge(settings).inspect
-      # TODO: Move singleton to instance variable
-      Bridge.set_light_state(id, @options.merge(settings))
+      if bridge.set_light_state(id, options.merge(settings))
+        settings.each do |key, value|
+          @status['state'][key.to_s] = value # or refresh!
+        end
+      end
     end
 
     # Experimental Sunrise/Sunset  action

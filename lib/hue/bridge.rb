@@ -71,7 +71,7 @@ module Hue
 
     def bulbs
       # puts status['lights'].inspect
-      @bulbs ||= lights.keys.map { |b| Bulb.new(b) }
+      @bulbs ||= lights.keys.map { |b| Bulb.new(self, b) }
     end
 
     # def remove_schedule(schedule_id)
@@ -84,6 +84,10 @@ module Hue
     #   puts "Removing #{ids.size} schedule#{'s' if ids.size != 1}..."
     #   ids.each{|x| remove_schedule x}
     # end
+
+    def get_light_state(id)
+      index(uri('lights', id))
+    end
 
     def set_light_state(id, state)
       update(uri('lights', id, 'state'), state)
@@ -121,11 +125,11 @@ module Hue
     def display(response = nil)
       if response and response.code.to_s != '200'
         # Output to logger
-        puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
+        # puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
         false
       else
         # Output to logger
-        puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
+        # puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
         true
       end
     end
