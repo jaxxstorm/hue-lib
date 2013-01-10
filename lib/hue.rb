@@ -46,4 +46,14 @@ module Hue
     end
   end
 
+  module API
+    class Error < ::Hue::Error
+      def initialize(api_error)
+        @type = api_error['type']
+        @address = api_error['address']
+        super(api_error['description'])
+      end
+    end
+  end
+
 end

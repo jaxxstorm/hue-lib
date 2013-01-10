@@ -34,6 +34,13 @@ describe Hue::Bridge do
       bridge.status.should == api_reply(:base)
     end
 
+    it 'should report errors' do
+      with_fake_request(:lights, :unauthorized)
+      lambda do
+        bridge.lights
+      end.should raise_error(Hue::API::Error, 'unauthorized user')
+    end
+
     it 'should report the bridge lights' do
       with_fake_request(:lights)
       bridge.lights.should == api_reply(:lights)

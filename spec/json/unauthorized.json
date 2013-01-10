@@ -1,0 +1,10 @@
+[
+  {
+    "error":
+    {
+      "type":1,
+      "address":"/some_address",
+      "description":"unauthorized user"
+    }
+  }
+]

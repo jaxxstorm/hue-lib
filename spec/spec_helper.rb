@@ -17,9 +17,9 @@ def with_fake_request_base
     to_return(:status => 200, :body => api_reply_json(:base), :headers => {})
 end
 
-def with_fake_request(named)
+def with_fake_request(named, body_name = named)
   stub_request(:get, "http://localhost/api/test_identifier/#{named.to_s}").
-    to_return(:status => 200, :body => api_reply_json(named), :headers => {})
+    to_return(:status => 200, :body => api_reply_json(body_name), :headers => {})
 end
 
 def api_reply_json(named)

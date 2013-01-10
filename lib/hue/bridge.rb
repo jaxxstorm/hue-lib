@@ -100,8 +100,17 @@ module Hue
     end
 
     def index(url)
-      json = Net::HTTP.get(url)
-      JSON.parse(json)
+      # json = Net::HTTP.get(url)
+      # JSON.parse(json)
+      request = Net::HTTP::Get.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
+      response = Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
+      display(response)
+      json = JSON.parse(response.body)
+      if json.is_a?(Array) && error = json.first['error']
+        raise Hue::API::Error.new(error)
+      else
+        json
+      end
     end
 
     def update(url, settings = {})
