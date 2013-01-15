@@ -25,7 +25,7 @@ describe Hue::Config do
   it "should throw and error if a named config doesn't exist" do
     lambda do
       klass.named('not_default')
-    end.should raise_error(Hue::Error, /Config named (.*) not found/)
+    end.should raise_error(Hue::Config::NotFound, /Config named (.*) not found/)
   end
 
   context 'with a bridge config file, containing the default bridge' do

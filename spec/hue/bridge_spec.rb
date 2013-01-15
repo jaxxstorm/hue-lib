@@ -10,10 +10,6 @@ describe Hue::Bridge do
     self.class.klass
   end
 
-  # it 'should acts as a singleton and give access to the instance' do
-  #   klass.instance.should be_a_kind_of(Hue::Bridge)
-  # end
-
   it 'should allow registering a new bridge' do
     pending
   end
@@ -22,16 +18,12 @@ describe Hue::Bridge do
     pending
   end
 
-  context 'when instantiated with a given config' do
+  context 'when instantiated with the default config' do
     bridge = klass.new
 
-    # before(:each) do
-    #   with_fake_index_request
-    # end
-
     it 'should report the bridge status' do
-      with_fake_request_base
-      bridge.status.should == api_reply(:base)
+      with_fake_request
+      bridge.status.should == api_reply(:get_success)
     end
 
     it 'should report errors' do
@@ -70,6 +62,20 @@ describe Hue::Bridge do
       end
     end
 
+    it 'should allow unregistering an existing config' do
+      with_fake_delete('config/whitelist/test_identifier')
+      bridge.unregister
+    end
+  end
+
+  context 'when instantiated with a new config' do
+    config = Hue::Config.new(TEST_ENDPOINT, 'new_test_id')
+    bridge = klass.new(config)
+
+    it 'should allow registering the new config' do
+      with_fake_post(nil, {:username => config.identifier, :devicetype => Hue.device_type})
+      bridge.register
+    end
   end
 
 end

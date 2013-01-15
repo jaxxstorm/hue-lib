@@ -1,5 +1,7 @@
 module Hue
   class Config
+    class NotFound < Hue::Error; end;
+
     STRING_DEFAULT = 'default'
     STRING_BASE_URI = 'base_uri'
     STRING_IDENTIFIER = 'identifier'
@@ -8,7 +10,7 @@ module Hue
     require 'fileutils'
 
     def self.bridges_config_path
-      File.join(ENV['HOME'], ".#{APP_NAME}", 'bridges.yml')
+      File.join(ENV['HOME'], ".#{Hue.device_type}", 'bridges.yml')
     end
 
     def self.default
@@ -20,7 +22,7 @@ module Hue
       if named_yaml = yaml[name]
         Config.new(named_yaml[STRING_BASE_URI], named_yaml[STRING_IDENTIFIER], name)
       else
-        raise Error.new("Config named '#{name}' not found.")
+        raise NotFound.new("Config named '#{name}' not found.")
       end
     end
 

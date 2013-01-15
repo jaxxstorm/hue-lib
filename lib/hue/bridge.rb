@@ -1,44 +1,26 @@
-require 'digest/md5'
-require 'uuid'
-# require 'singleton'
-
 module Hue
   class Bridge
-    # include Singleton
 
-    # # Remove
-    # def self.method_missing(method, *args, &block)
-    #   if args.empty?
-    #     self.instance.send method
-    #   else
-    #     self.instance.send method, *args
-    #   end
-    # end
-
-    # Move to APP class
-    def self.register(host = BASE)
-      # TODO: Look for default config.
-      puts "Please press the button on bridge before continuing."
-      puts "Once done, press Enter to continue."
-      gets
-      secret = Digest::MD5.hexdigest(UUID.generate) # one time UUID
-      puts "Registering app...(#{secret})"
-      config = Hue::Config.new(host, secret)
-      instance.create(
-        URI.parse(config.base_uri),
-        {"username" => config.base_uri, "devicetype" => Hue.device_type}
-      )
-      config.write
+    def self.register_default(host = BASE)
+      if config = Config.default rescue nil
+        raise Hue::Error.new("Default configuration already registered.")
+      else
+        secret = Hue.one_time_uuid
+        puts "Registering app...(#{secret})"
+        config = Hue::Config.new(host, secret)
+        instance = Hue::Bridge.new(config)
+        instance.register
+        config.write
+        instance
+      end
     end
 
-    # Move to APP class
-    def self.remove
+    def self.remove_default
       config = Config.default
-      instance.delete(
-        URI.parse(config.base_uri),
-        {"username" => config.identifier}
-      )
+      instance = Hue::Bridge.new(config)
+      instance.unregister
       config.delete
+      true
     end
 
     public
@@ -93,42 +75,55 @@ module Hue
       update(uri('lights', id, 'state'), state)
     end
 
+    def register
+      create(URI.parse(hue_config.base_uri),
+             {"username" => hue_config.identifier, "devicetype" => Hue.device_type})
+    end
+
+    def unregister
+      delete(uri('config', 'whitelist', hue_config.identifier))
+    end
+
     private
 
     def uri(*args)
-      URI [hue_config.base_uri, hue_config.identifier, args].flatten.reject{|x| x.to_s.strip == ''}.join('/')
+      URI.parse([hue_config.base_uri, hue_config.identifier, args].flatten.reject { |x| x.to_s.strip == '' }.join('/'))
     end
 
     def index(url)
-      # json = Net::HTTP.get(url)
-      # JSON.parse(json)
       request = Net::HTTP::Get.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
-      response = Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
-      display(response)
-      json = JSON.parse(response.body)
-      if json.is_a?(Array) && error = json.first['error']
-        raise Hue::API::Error.new(error)
-      else
-        json
-      end
+      parse_and_check_response(Net::HTTP.new(url.host, url.port).start { |http| http.request(request) })
     end
 
     def update(url, settings = {})
       request = Net::HTTP::Put.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
       request.body = settings.to_json
-      display Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
+      parse_and_check_response(Net::HTTP.new(url.host, url.port).start { |http| http.request(request) })
     end
 
     def delete(url, settings = {})
       request = Net::HTTP::Delete.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
       request.body = settings.to_json
-      display Net::HTTP.new(url.host, url.port).start{|http| http.request(request)}
+      parse_and_check_response(Net::HTTP.new(url.host, url.port).start{ |http| http.request(request) })
     end
 
     def create(url, settings = {})
       request = Net::HTTP::Post.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
       request.body = settings.to_json
-      display Net::HTTP.new(url.host, url.port).start {|http| http.request(request) }
+      parse_and_check_response(Net::HTTP.new(url.host, url.port).start { |http| http.request(request) })
+    end
+
+    def parse_and_check_response(response)
+      if display(response)
+        json = JSON.parse(response.body)
+        if json.is_a?(Array) && error = json.first['error']
+          raise Hue::API::Error.new(error)
+        else
+          json
+        end
+      else
+        raise Hue::Error.new("Unexpected response: #{response.code}, #{response.message}")
+      end
     end
 
     def display(response = nil)

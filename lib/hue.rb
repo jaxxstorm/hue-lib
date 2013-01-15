@@ -1,11 +1,10 @@
-APP_NAME = 'ruby_hue'
-BASE    = 'http://10.10.10.20/api'
-# UUID    = 'd79713a3433df3d972ba7c22cb1cc23e'
-# Digest::MD5.hexdigest('aa4f6bc0-2045-0130-8cf0-0018de9ecdd0')
+BASE    = 'http://10.10.10.11/api'
 
 require 'net/http'
 require 'json'
 require 'matrix'
+require 'digest/md5'
+require 'uuid'
 
 RGB_MATRIX = Matrix[
   [3.233358361244897, -1.5262682428425947, 0.27916711262124544],
@@ -13,13 +12,9 @@ RGB_MATRIX = Matrix[
   [0.12942207487871885, 0.19839858329512317, 2.0280912276039635]
 ]
 
-require 'hue/bridge.rb'
-require 'hue/bulb.rb'
-require 'hue/config.rb'
-
 module Hue
 
-  DEVICE_TYPE = "RubyHue"
+  DEVICE_TYPE = "hue-lib"
 
   def self.device_type
     DEVICE_TYPE
@@ -27,6 +22,10 @@ module Hue
 
   def self.config
     Hue::Config.default
+  end
+
+  def self.one_time_uuid
+    Digest::MD5.hexdigest(UUID.generate)
   end
 
   class Error < StandardError
@@ -57,3 +56,7 @@ module Hue
   end
 
 end
+
+require 'hue/config.rb'
+require 'hue/bridge.rb'
+require 'hue/bulb.rb'
