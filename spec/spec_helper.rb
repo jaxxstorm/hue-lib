@@ -11,8 +11,6 @@ TEST_BRIDGE_CONFIG = YAML.load_file(TEST_BRIDGE_CONFIG_PATH)
 TEST_JSON_DATA_PATH = File.join(SPEC_DIR, 'json')
 TEST_ENDPOINT = "http://localhost/api"
 
-Hue::Config.expects(:bridges_config_path).at_least_once.returns(TEST_BRIDGE_CONFIG_PATH)
-
 def with_fake_request_base
   stub_request(:get, "#{TEST_ENDPOINT}/test_identifier").
     to_return(:status => 200, :body => api_reply_json(:get_success), :headers => {})
@@ -46,9 +44,9 @@ def with_fake_update(named, put_body = {})
 end
 
 def with_fake_post(named, post_body = {}, post_reply_name = 'post_success')
-  stub = stub_request(:post, join_paths(TEST_ENDPOINT, named)).
-    with(:body => post_body.to_json).
-    to_return(:status => 200, :body => api_reply_json(join_paths(named, post_reply_name)), :headers => {})
+  stub = stub_request(:post, join_paths(TEST_ENDPOINT, named))
+  stub.with(:body => post_body.to_json) unless post_body.empty?
+  stub.to_return(:status => 200, :body => api_reply_json(join_paths(named, post_reply_name)), :headers => {})
 
   if block_given?
     yield
@@ -69,3 +67,43 @@ end
 def join_paths(*paths)
   File.join(paths.delete_if { |entry| entry.nil? || entry.empty? })
 end
+
+def with_stdout(expected_output, &block)
+  original_stdout = $stdout
+  new_stdout = StringIO.new
+  begin
+    $stdout = new_stdout
+    yield
+    new_stdout.seek(0)
+    output = new_stdout.read
+    output.should match(expected_output)
+  ensure
+    new_stdout.close
+    $stdout = original_stdout
+  end
+end
+
+def with_temp_config_path(write_config = false)
+  temp_config_path = File.join(SPEC_DIR, 'config', 'temp')
+  FileUtils.mkdir_p(temp_config_path)
+  temp_config = File.join(temp_config_path, 'bridges.yml')
+  if write_config
+    File.open(temp_config, 'w+' ) do |out|
+      YAML.dump(TEST_BRIDGE_CONFIG, out)
+    end
+  end
+  Hue::Config.expects(:bridges_config_path).at_least_once.returns(temp_config)
+
+  begin
+    yield
+  ensure
+    FileUtils.rm_f(temp_config)
+    mock_bridge_config_path
+  end
+end
+
+def mock_bridge_config_path
+  Hue::Config.expects(:bridges_config_path).at_least_once.returns(TEST_BRIDGE_CONFIG_PATH)
+end
+
+mock_bridge_config_path

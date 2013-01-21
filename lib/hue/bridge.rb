@@ -1,7 +1,7 @@
 module Hue
   class Bridge
 
-    def self.register_default(host = BASE)
+    def self.register_default(host = nil)
       if config = Config.default rescue nil
         raise Hue::Error.new("Default configuration already registered.")
       else

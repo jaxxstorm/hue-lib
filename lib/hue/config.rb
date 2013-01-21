@@ -37,7 +37,7 @@ module Hue
     end
 
     def write(config_file = self.class.bridges_config_path)
-      yaml = YAML.load_file(self.class.bridges_config_path) rescue Hash::New
+      yaml = YAML.load_file(self.class.bridges_config_path) rescue Hash.new
       if yaml.key?(name)
         raise "Configuration named '#{name}' already exists in #{config_file}\nPlease de-register before creating a new one with the same name."
       else

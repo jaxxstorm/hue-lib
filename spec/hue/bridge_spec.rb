@@ -10,12 +10,28 @@ describe Hue::Bridge do
     self.class.klass
   end
 
-  it 'should allow registering a new bridge' do
-    pending
-  end
+  context 'when registering or un-registering a default bridge' do
+    it 'should throw and error if a default bridge already exists' do
+      lambda do
+        klass.register_default
+      end.should raise_error(Hue::Error, 'Default configuration already registered.')
+    end
 
-  it 'should allow un-registering a bridge' do
-    pending
+    it 'should allow a new default bridge if one doesn\'t exist' do
+      with_temp_config_path do
+        with_fake_post(nil)
+        with_stdout(/Registering app...(.*)$/) do
+          instance = klass.register_default(TEST_ENDPOINT)
+        end
+      end
+    end
+
+    it 'should allow un-registering the default bridge' do
+      with_temp_config_path(true) do
+        with_fake_delete('config/whitelist/test_identifier')
+        instance = klass.remove_default
+      end
+    end
   end
 
   context 'when instantiated with the default config' do

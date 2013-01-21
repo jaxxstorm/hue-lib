@@ -1,5 +1,3 @@
-BASE    = 'http://10.10.10.11/api'
-
 require 'net/http'
 require 'json'
 require 'matrix'
