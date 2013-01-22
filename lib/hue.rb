@@ -18,8 +18,8 @@ module Hue
     DEVICE_TYPE
   end
 
-  def self.config
-    Hue::Config.default
+  def self.application
+    Hue::Config::Application.default
   end
 
   def self.one_time_uuid
@@ -55,6 +55,7 @@ module Hue
 
 end
 
-require 'hue/config.rb'
+require 'hue/config/abstract.rb'
+require 'hue/config/application.rb'
 require 'hue/bridge.rb'
 require 'hue/bulb.rb'

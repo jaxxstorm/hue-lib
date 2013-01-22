@@ -1,13 +1,16 @@
+require 'socket'
+require 'timeout'
+
 module Hue
   class Bridge
 
     def self.register_default(host = nil)
-      if config = Config.default rescue nil
+      if config = Hue.application rescue nil
         raise Hue::Error.new("Default configuration already registered.")
       else
         secret = Hue.one_time_uuid
         puts "Registering app...(#{secret})"
-        config = Hue::Config.new(host, secret)
+        config = Hue::Config::Application.new(host, secret)
         instance = Hue::Bridge.new(config)
         instance.register
         config.write
@@ -16,19 +19,47 @@ module Hue
     end
 
     def self.remove_default
-      config = Config.default
+      config = Hue.application
       instance = Hue::Bridge.new(config)
       instance.unregister
       config.delete
       true
     end
 
+    def self.discover(timeout = 2)
+      socket  = UDPSocket.new(Socket::AF_INET)
+      payload = <<-PAYLOAD
+M-SEARCH * HTTP/1.1
+HOST: 239.255.255.250:1900
+MAN: ssdp:discover
+MX: 10
+ST: ssdp:all
+      PAYLOAD
+
+      socket.send(payload, 0, "239.255.255.250", 1900)
+      bridges = Hash.new
+
+      Timeout.timeout(timeout, Hue::Error) do
+        loop do
+          message, (address_family, port, hostname, ip_add) = socket.recvfrom(1024)
+          if message =~ /IpBridge/ && location = /LOCATION: (.*)$/.match(message)
+            if uuid = /uuid:(.{36})/.match(message)
+              # Assume this is Philips Hue for now.
+              bridges[uuid.captures.first] = ip_add
+            end
+          end
+        end
+      end
+    rescue Hue::Error
+      bridges
+    end
+
     public
 
-    attr_reader :hue_config
+    attr_reader :application_config
 
-    def initialize(hue_config = Hue.config)
-      @hue_config = hue_config
+    def initialize(application_config = Hue.application)
+      @application_config = application_config
     end
 
     def status
@@ -76,18 +107,18 @@ module Hue
     end
 
     def register
-      create(URI.parse(hue_config.base_uri),
-             {"username" => hue_config.identifier, "devicetype" => Hue.device_type})
+      create(URI.parse(application_config.base_uri),
+             {"username" => application_config.identifier, "devicetype" => Hue.device_type})
     end
 
     def unregister
-      delete(uri('config', 'whitelist', hue_config.identifier))
+      delete(uri('config', 'whitelist', application_config.identifier))
     end
 
     private
 
     def uri(*args)
-      URI.parse([hue_config.base_uri, hue_config.identifier, args].flatten.reject { |x| x.to_s.strip == '' }.join('/'))
+      URI.parse([application_config.base_uri, application_config.identifier, args].flatten.reject { |x| x.to_s.strip == '' }.join('/'))
     end
 
     def index(url)

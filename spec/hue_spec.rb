@@ -6,8 +6,8 @@ describe Hue do
     Hue.device_type.should == Hue::DEVICE_TYPE
   end
 
-  it 'should return the default config' do
-    Hue.config.should be_a(Hue::Config)
+  it 'should return the default application config' do
+    Hue.application.should be_a(Hue::Config::Application)
   end
 
 end

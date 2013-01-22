@@ -6,8 +6,8 @@ require 'mocha'
 WebMock.disable_net_connect!
 
 SPEC_DIR = File.dirname(__FILE__)
-TEST_BRIDGE_CONFIG_PATH = File.join(SPEC_DIR, 'config', 'bridges.yml')
-TEST_BRIDGE_CONFIG = YAML.load_file(TEST_BRIDGE_CONFIG_PATH)
+TEST_CONFIG_APPLICATION_PATH = File.join(SPEC_DIR, 'config', 'applications.yml')
+TEST_CONFIG_APPLICATION = YAML.load_file(TEST_CONFIG_APPLICATION_PATH)
 TEST_JSON_DATA_PATH = File.join(SPEC_DIR, 'json')
 TEST_ENDPOINT = "http://localhost/api"
 
@@ -86,13 +86,11 @@ end
 def with_temp_config_path(write_config = false)
   temp_config_path = File.join(SPEC_DIR, 'config', 'temp')
   FileUtils.mkdir_p(temp_config_path)
-  temp_config = File.join(temp_config_path, 'bridges.yml')
+  temp_config = File.join(temp_config_path, 'applications.yml')
   if write_config
-    File.open(temp_config, 'w+' ) do |out|
-      YAML.dump(TEST_BRIDGE_CONFIG, out)
-    end
+    create_test_application_config(temp_config)
   end
-  Hue::Config.expects(:bridges_config_path).at_least_once.returns(temp_config)
+  Hue::Config::Application.expects(:config_path).at_least_once.returns(temp_config)
 
   begin
     yield
@@ -102,8 +100,14 @@ def with_temp_config_path(write_config = false)
   end
 end
 
+def create_test_application_config(path = TEST_CONFIG_APPLICATION_PATH)
+  File.open(path, 'w' ) do |out|
+    YAML.dump(TEST_CONFIG_APPLICATION, out)
+  end
+end
+
 def mock_bridge_config_path
-  Hue::Config.expects(:bridges_config_path).at_least_once.returns(TEST_BRIDGE_CONFIG_PATH)
+  Hue::Config::Application.expects(:config_path).at_least_once.returns(TEST_CONFIG_APPLICATION_PATH)
 end
 
 mock_bridge_config_path

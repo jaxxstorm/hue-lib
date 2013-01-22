@@ -104,4 +104,5 @@ describe Hue::Bulb do
     end
 
   end
+
 end

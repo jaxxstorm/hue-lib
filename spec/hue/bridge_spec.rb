@@ -85,7 +85,7 @@ describe Hue::Bridge do
   end
 
   context 'when instantiated with a new config' do
-    config = Hue::Config.new(TEST_ENDPOINT, 'new_test_id')
+    config = Hue::Config::Application.new(TEST_ENDPOINT, 'new_test_id')
     bridge = klass.new(config)
 
     it 'should allow registering the new config' do
