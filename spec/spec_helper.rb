@@ -90,7 +90,7 @@ def with_temp_config_path(write_config = false)
   if write_config
     create_test_application_config(temp_config)
   end
-  Hue::Config::Application.expects(:config_path).at_least_once.returns(temp_config)
+  Hue::Config::Application.expects(:file_path).at_least_once.returns(temp_config)
 
   begin
     yield
@@ -107,7 +107,7 @@ def create_test_application_config(path = TEST_CONFIG_APPLICATION_PATH)
 end
 
 def mock_bridge_config_path
-  Hue::Config::Application.expects(:config_path).at_least_once.returns(TEST_CONFIG_APPLICATION_PATH)
+  Hue::Config::Application.expects(:file_path).at_least_once.returns(TEST_CONFIG_APPLICATION_PATH)
 end
 
 mock_bridge_config_path

@@ -17,7 +17,7 @@ describe Hue::Config::Application do
   end
 
   it 'should report the config file location' do
-    klass.config_path.should == TEST_CONFIG_APPLICATION_PATH
+    klass.file_path.should == TEST_CONFIG_APPLICATION_PATH
   end
 
   it "should throw and error if a named config doesn't exist" do
@@ -46,7 +46,7 @@ describe Hue::Config::Application do
 
     it 'should allow writing the new config to file' do
       config.write
-      YAML.load_file(klass.config_path)['not_default'].should be_a(Hash)
+      YAML.load_file(klass.file_path)['not_default'].should be_a(Hash)
     end
 
     it 'should allow fetching that name config' do
@@ -56,7 +56,7 @@ describe Hue::Config::Application do
 
     it 'should allow deleting that named config from the file' do
       config.delete
-      YAML.load_file(klass.config_path)['not_default'].should be_nil
+      YAML.load_file(klass.file_path)['not_default'].should be_nil
     end
   end
 

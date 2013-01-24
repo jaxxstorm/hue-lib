@@ -6,7 +6,7 @@ module Hue
       STRING_BASE_URI = 'base_uri'
       STRING_IDENTIFIER = 'identifier'
 
-      def self.config_path
+      def self.file_path
         File.join(ENV['HOME'], ".#{Hue.device_type}", 'applications.yml')
       end
 
@@ -15,7 +15,7 @@ module Hue
       end
 
       def self.named(name)
-        yaml = read_file(config_path)
+        yaml = read_file(file_path)
         if named_yaml = yaml[name]
           new(named_yaml[STRING_BASE_URI], named_yaml[STRING_IDENTIFIER], name)
         else
@@ -30,7 +30,7 @@ module Hue
       def initialize(base_uri, identifier, name = STRING_DEFAULT)
         @base_uri = base_uri
         @identifier = identifier
-        super(name, self.class.config_path)
+        super(name, self.class.file_path)
       end
 
       def ==(rhs)

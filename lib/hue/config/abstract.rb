@@ -14,7 +14,7 @@ module Hue
       def initialize(name, path)
         @path = path
         @name = name
-        self.class.setup_config_path(self.path)
+        self.class.setup_file_path(self.path)
       end
 
       def write(overwrite_existing_key = false)
@@ -57,7 +57,7 @@ module Hue
         end
       end
 
-      def self.setup_config_path(path)
+      def self.setup_file_path(path)
         dir = File.dirname(path)
         FileUtils.mkdir_p(dir) unless Dir.exists?(dir)
       end
