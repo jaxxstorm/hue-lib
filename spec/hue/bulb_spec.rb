@@ -2,16 +2,8 @@ require 'spec_helper.rb'
 
 describe Hue::Bulb do
 
-  def self.klass
-    Hue::Bulb
-  end
-
-  def klass
-    self.class.klass
-  end
-
   context 'when instantiated with a given bridge and id' do
-    bulb = klass.new(Hue::Bridge.new, 1)
+    bulb = described_class.new(test_bridge, 1)
 
     before(:all) do
       with_fake_request('lights/1')

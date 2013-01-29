@@ -9,20 +9,12 @@ end
 
 describe Hue::Config::Abstract do
 
-  def self.klass
-    Hue::Config::AbstractTest
-  end
-
-  def klass
-    self.class.klass
-  end
-
   before(:all) do
     create_test_application_config
   end
 
   context 'given an new config' do
-    config = klass.new('test', TEST_CONFIG_APPLICATION_PATH)
+    config = described_class.new('test', TEST_CONFIG_APPLICATION_PATH)
 
     it 'should report the values' do
       config.name == 'test'

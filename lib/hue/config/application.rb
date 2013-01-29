@@ -2,8 +2,8 @@ module Hue
   module Config
     class Application < Abstract
 
+      STRING_BASE_ID = 'base_id'
       STRING_DEFAULT = 'default'
-      STRING_BASE_URI = 'base_uri'
       STRING_IDENTIFIER = 'identifier'
 
       def self.file_path
@@ -17,7 +17,7 @@ module Hue
       def self.named(name)
         yaml = read_file(file_path)
         if named_yaml = yaml[name]
-          new(named_yaml[STRING_BASE_URI], named_yaml[STRING_IDENTIFIER], name)
+          new(named_yaml[STRING_BASE_ID], named_yaml[STRING_IDENTIFIER], name)
         else
           raise NotFound.new("Config named '#{name}' not found.")
         end
@@ -25,17 +25,17 @@ module Hue
 
       public
 
-      attr_reader :base_uri, :identifier, :name
+      attr_reader :base_id, :identifier, :name
 
-      def initialize(base_uri, identifier, name = STRING_DEFAULT)
-        @base_uri = base_uri
+      def initialize(base_id, identifier, name = STRING_DEFAULT, path = self.class.file_path)
+        super(name, path)
+        @base_id = base_id
         @identifier = identifier
-        super(name, self.class.file_path)
       end
 
       def ==(rhs)
         super(rhs) &&
-          self.base_uri == rhs.base_uri &&
+          self.base_id == rhs.base_id &&
           self.identifier == rhs.identifier
       end
 
@@ -43,17 +43,9 @@ module Hue
 
       def add_self_to_yaml(yaml)
         yaml[name] = {
-          STRING_BASE_URI => self.base_uri,
+          STRING_BASE_ID => self.base_id,
           STRING_IDENTIFIER => identifier.force_encoding('ASCII') # Avoid binary encoded YAML
         }
-      end
-
-      def self.read_file(config_file)
-        begin
-          yaml = YAML.load_file(config_file)
-        rescue => err
-          raise Error.new("Failed to read configuration file", err)
-        end
       end
 
     end

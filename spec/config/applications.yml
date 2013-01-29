@@ -1,4 +1,4 @@
 ---
 default:
-  base_uri: http://localhost/api
-  identifier: test_identifier
+  base_id: bc6be180-4c57-0130-8d8f-0018de9ecdd0
+  identifier: application_uuid
