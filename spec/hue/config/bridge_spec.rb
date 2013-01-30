@@ -15,7 +15,7 @@ describe Hue::Config::Bridge do
   it 'should find existing bridges given an id' do
     found = described_class.find(TEST_BRIDGE_UUID)
     found.id.should == TEST_BRIDGE_UUID
-    found.uri.should == TEST_BASE_URI
+    found.uri.should == TEST_BRIDGE_URI
 
     described_class.find('something').should be_nil
   end

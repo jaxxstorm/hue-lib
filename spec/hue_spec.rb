@@ -22,7 +22,7 @@ describe Hue do
   end
 
   context 'when discovering new bridges' do
-    it 'should return a list discovered bridged' do
+    it 'should return a list discovered bridges' do
       bridges = Hue.discover
       bridges.should == {TEST_UDP_BRIDGE_UUID => TEST_UDP_BRIDGE_URI}
     end

@@ -2,9 +2,9 @@ module Hue
   module Config
     class Application < Abstract
 
-      STRING_BASE_ID = 'base_id'
+      STRING_BRIDGE_ID = 'bridge_id'
       STRING_DEFAULT = 'default'
-      STRING_IDENTIFIER = 'identifier'
+      STRING_ID = 'id'
 
       def self.file_path
         File.join(ENV['HOME'], ".#{Hue.device_type}", 'applications.yml')
@@ -17,7 +17,7 @@ module Hue
       def self.named(name)
         yaml = read_file(file_path)
         if named_yaml = yaml[name]
-          new(named_yaml[STRING_BASE_ID], named_yaml[STRING_IDENTIFIER], name)
+          new(named_yaml[STRING_BRIDGE_ID], named_yaml[STRING_ID], name)
         else
           raise NotFound.new("Config named '#{name}' not found.")
         end
@@ -25,28 +25,28 @@ module Hue
 
       public
 
-      attr_reader :base_id, :identifier, :name
+      attr_reader :bridge_id, :id, :name
 
-      def initialize(base_id, identifier, name = STRING_DEFAULT, path = self.class.file_path)
+      def initialize(bridge_id, id, name = STRING_DEFAULT, path = self.class.file_path)
         super(name, path)
-        @base_id = base_id
-        @identifier = identifier
+        @bridge_id = bridge_id
+        @id = id
       end
 
       def ==(rhs)
         super(rhs) &&
-          self.base_id == rhs.base_id &&
-          self.identifier == rhs.identifier
+          self.bridge_id == rhs.bridge_id &&
+          self.id == rhs.id
       end
 
       private
 
       def add_self_to_yaml(yaml)
         key = self.name.dup.force_encoding('ASCII') # Avoid binary encoded YAML
-        base = base_id.dup.force_encoding('ASCII')
+        bridge = bridge_id.dup.force_encoding('ASCII')
         yaml[key] = {
-          STRING_BASE_ID => base,
-          STRING_IDENTIFIER => identifier.force_encoding('ASCII')
+          STRING_ID => id.force_encoding('ASCII'),
+          STRING_BRIDGE_ID => bridge,
         }
       end
 

@@ -107,11 +107,11 @@ end
 
 # BRIDGE - API CALLS
 
-TEST_BASE_URI = 'http://localhost/api'
+TEST_BRIDGE_URI = 'http://localhost/api'
 TEST_APPLICATION_UUID = 'application_uuid'
 
 def test_bridge
-  Hue::Bridge.new(TEST_APPLICATION_UUID, TEST_BASE_URI)
+  Hue::Bridge.new(TEST_APPLICATION_UUID, TEST_BRIDGE_URI)
 end
 
 def api_reply_json(named)
@@ -124,19 +124,14 @@ def api_reply(named)
   JSON.parse(api_reply_json(named))
 end
 
-def with_fake_request_base
-  stub_request(:get, "#{TEST_BASE_URI}/#{TEST_APPLICATION_UUID}").
-    to_return(:status => 200, :body => api_reply_json(:get_success), :headers => {})
-end
-
 def with_fake_request(named = nil, body_name = nil)
   body_name ||= (named.nil? ? 'get_success' : named)
-  stub_request(:get, join_paths(TEST_BASE_URI, TEST_APPLICATION_UUID, named.to_s)).
+  stub_request(:get, join_paths(TEST_BRIDGE_URI, TEST_APPLICATION_UUID, named.to_s)).
     to_return(:status => 200, :body => api_reply_json(body_name), :headers => {})
 end
 
 def with_fake_update(named, put_body = {})
-  stub = stub_request(:put, "#{TEST_BASE_URI}/#{TEST_APPLICATION_UUID}/#{named.to_s}").
+  stub = stub_request(:put, "#{TEST_BRIDGE_URI}/#{TEST_APPLICATION_UUID}/#{named.to_s}").
     with(:body => put_body.to_json).
     to_return(:status => 200, :body => api_reply_json(:put_success), :headers => {})
 
@@ -146,7 +141,7 @@ def with_fake_update(named, put_body = {})
   end
 end
 
-def with_fake_post(named, post_body = {}, post_reply_name = 'post_success', uri = TEST_BASE_URI)
+def with_fake_post(named, post_body = {}, post_reply_name = 'post_success', uri = TEST_BRIDGE_URI)
   stub = stub_request(:post, join_paths(uri, named))
   stub.with(:body => post_body.to_json) unless post_body.empty?
   stub.to_return(:status => 200, :body => api_reply_json(join_paths(named, post_reply_name)), :headers => {})
@@ -158,7 +153,7 @@ def with_fake_post(named, post_body = {}, post_reply_name = 'post_success', uri 
 end
 
 def with_fake_delete(named, delete_reply = 'delete_success')
-  stub = stub_request(:delete, "#{TEST_BASE_URI}/#{TEST_APPLICATION_UUID}/#{named.to_s}").
+  stub = stub_request(:delete, "#{TEST_BRIDGE_URI}/#{TEST_APPLICATION_UUID}/#{named.to_s}").
     to_return(:status => 200, :body => api_reply_json(join_paths(named, delete_reply)), :headers => {})
 
   if block_given?

@@ -33,7 +33,7 @@ module Hue
       secret = Hue.one_time_uuid
       app_config = Hue::Config::Application.new(bridge_config.id, secret)
       puts "Registering app...(#{secret})"
-      instance = Hue::Bridge.new(app_config.identifier, bridge_config.uri)
+      instance = Hue::Bridge.new(app_config.id, bridge_config.uri)
       instance.register
       app_config.write
       instance
@@ -42,14 +42,14 @@ module Hue
 
   def self.application
     application_config = Hue::Config::Application.default
-    bridge_config = Hue::Config::Bridge.find(application_config.base_id)
-    bridge_config ||= register_bridges[application_config.base_id]
+    bridge_config = Hue::Config::Bridge.find(application_config.bridge_id)
+    bridge_config ||= register_bridges[application_config.bridge_id]
 
     if bridge_config.nil?
-      raise Error.new("Unable to find bridge: #{application_config.base_id}")
+      raise Error.new("Unable to find bridge: #{application_config.bridge_id}")
     end
 
-    Hue::Bridge.new(application_config.identifier, bridge_config.uri)
+    Hue::Bridge.new(application_config.id, bridge_config.uri)
   end
 
   def self.remove_default

@@ -23,8 +23,8 @@ describe Hue::Config::Application do
 
     it "should give the default config and report it's values" do
       config.name == described_class::STRING_DEFAULT
-      config.base_id == TEST_CONFIG_APPLICATION[config.name][described_class::STRING_BASE_ID]
-      config.identifier == TEST_CONFIG_APPLICATION[config.name][described_class::STRING_IDENTIFIER]
+      config.bridge_id == TEST_CONFIG_APPLICATION[config.name][described_class::STRING_BRIDGE_ID]
+      config.id == TEST_CONFIG_APPLICATION[config.name][described_class::STRING_ID]
     end
 
     it 'should allow deleting the default config from the file' do
@@ -38,8 +38,8 @@ describe Hue::Config::Application do
 
     it 'should report the values' do
       config.name == 'not_default'
-      config.base_id == 'http://someip/api'
-      config.identifier == 'not_default'
+      config.bridge_id == 'http://someip/api'
+      config.id == 'not_default'
     end
 
     it 'should allow writing the new config to file' do

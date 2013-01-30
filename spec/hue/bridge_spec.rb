@@ -54,7 +54,7 @@ describe Hue::Bridge do
 
   context 'when instantiated with a new config' do
     new_id = 'new_test_id'
-    bridge = described_class.new(new_id, TEST_BASE_URI)
+    bridge = described_class.new(new_id, TEST_BRIDGE_URI)
 
     it 'should allow registering the new config' do
       with_fake_post(nil, {:username => new_id, :devicetype => Hue.device_type})

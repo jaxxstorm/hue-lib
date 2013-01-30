@@ -6,11 +6,11 @@ module Hue
 
     public
 
-    attr_reader :application_id, :base_uri
+    attr_reader :application_id, :bridge_uri
 
-    def initialize(application_id, base_uri)
+    def initialize(application_id, bridge_uri)
       @application_id = application_id
-      @base_uri = base_uri
+      @bridge_uri = bridge_uri
     end
 
     def status
@@ -58,7 +58,7 @@ module Hue
     end
 
     def register
-      create(URI.parse(base_uri),
+      create(URI.parse(bridge_uri),
              {"username" => application_id, "devicetype" => Hue.device_type})
     end
 
@@ -69,7 +69,7 @@ module Hue
     private
 
     def uri(*args)
-      URI.parse([base_uri, application_id, args].flatten.reject { |x| x.to_s.strip == '' }.join('/'))
+      URI.parse([bridge_uri, application_id, args].flatten.reject { |x| x.to_s.strip == '' }.join('/'))
     end
 
     def index(url)
