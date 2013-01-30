@@ -3,8 +3,8 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "hue-lib"
-  s.version     = '0.5.0'
-  s.authors     = ["Birkir A. Barkarson", ""]
+  s.version     = '0.6.0'
+  s.authors     = ["Birkir A. Barkarson", "Aaron Hurley"]
   s.email       = ["birkirb@stoicviking.net"]
   s.homepage    = "https://github.com/birkirb/hue-lib"
   s.summary     = %q{Ruby library for controlling Phillips Hue light bridge.}
