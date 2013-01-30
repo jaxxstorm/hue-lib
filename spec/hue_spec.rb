@@ -9,6 +9,10 @@ describe Hue do
     create_test_bridge_config
   end
 
+  before(:each) do
+    mock_udp_replies
+  end
+
   it 'should report the device type as itself' do
     described_class.device_type.should == described_class::DEVICE_TYPE
   end
@@ -18,13 +22,9 @@ describe Hue do
   end
 
   context 'when discovering new bridges' do
-    before(:each) do
-      mock_udp_replies
-    end
-
     it 'should return a list discovered bridged' do
       bridges = Hue.discover
-      bridges.should == {TEST_UDP_BRIDGE_UUID => TEST_UDP_BRIDGE_HOSTNAME}
+      bridges.should == {TEST_UDP_BRIDGE_UUID => TEST_UDP_BRIDGE_URI}
     end
 
     it 'should allow registering of discovered bridges' do
@@ -32,7 +32,7 @@ describe Hue do
       registered = Hue.register_bridges
       new_bridge = registered[TEST_UDP_BRIDGE_UUID]
       new_bridge.id.should == TEST_UDP_BRIDGE_UUID
-      new_bridge.uri.should == TEST_UDP_BRIDGE_HOSTNAME
+      new_bridge.uri.should == TEST_UDP_BRIDGE_URI
     end
   end
 
@@ -54,27 +54,27 @@ describe Hue do
   end
 
   context 'when registering or un-registering the application' do
-    # it 'should throw and error if the default already exists' do
-    #   lambda do
-    #     described_class.register_default
-    #   end.should raise_error(described_class::Error, described_class::ERROR_DEFAULT_EXISTS)
-    # end
+    it 'should throw and error if the default already exists' do
+      lambda do
+        described_class.register_default
+      end.should raise_error(described_class::Error, described_class::ERROR_DEFAULT_EXISTS)
+    end
 
-    # it 'should allow a new default if one doesn\'t exist' do
-    #   with_temp_config_path do
-    #     with_fake_post(nil)
-    #     with_stdout(/Registering app...(.*)$/) do
-    #       instance = described_class.register_default(TEST_BASE_URI)
-    #     end
-    #   end
-    # end
+    it 'should allow a new default if one doesn\'t exist' do
+      with_temp_config_path do
+        with_fake_post(nil, {}, 'post_success', TEST_UDP_BRIDGE_URI)
+        with_stdout(/Registering app...(.*)$/) do
+          instance = described_class.register_default
+        end
+      end
+    end
 
-    # it 'should allow un-registering the default' do
-    #   with_temp_config_path(true) do
-    #     with_fake_delete("config/whitelist/#{TEST_APPLICATION_UUID}")
-    #     instance = described_class.remove_default
-    #   end
-    # end
+    it 'should allow un-registering the default' do
+      with_temp_config_path(true) do
+        with_fake_delete("config/whitelist/#{TEST_APPLICATION_UUID}")
+        instance = described_class.remove_default
+      end
+    end
   end
 
 end

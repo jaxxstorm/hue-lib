@@ -94,6 +94,7 @@ end
 
 TEST_UDP_BRIDGE_UUID = '09230030-4c1e-0130-8d83-0018de9ecdd0'
 TEST_UDP_BRIDGE_HOSTNAME = 'upd-host'
+TEST_UDP_BRIDGE_URI = "http://#{TEST_UDP_BRIDGE_HOSTNAME}/api"
 
 def mock_udp_replies(uuid = TEST_UDP_BRIDGE_UUID, hostname = TEST_UDP_BRIDGE_HOSTNAME)
   reply = ["HTTP/1.1 200 OK\r\nCACHE-CONTROL: max-age=100\r\nEXT:\r\nLOCATION: http://127.0.0.1:80/description.xml\r\nSERVER: FreeRTOS/6.0.5, UPnP/1.0, IpBridge/0.1\r\nST: upnp:rootdevice\r\nUSN: uuid:#{uuid}::upnp:rootdevice\r\n\r\n", ["AF_INET", 1900, "127.0.0.1", hostname]]
@@ -145,8 +146,8 @@ def with_fake_update(named, put_body = {})
   end
 end
 
-def with_fake_post(named, post_body = {}, post_reply_name = 'post_success')
-  stub = stub_request(:post, join_paths(TEST_BASE_URI, named))
+def with_fake_post(named, post_body = {}, post_reply_name = 'post_success', uri = TEST_BASE_URI)
+  stub = stub_request(:post, join_paths(uri, named))
   stub.with(:body => post_body.to_json) unless post_body.empty?
   stub.to_return(:status => 200, :body => api_reply_json(join_paths(named, post_reply_name)), :headers => {})
 

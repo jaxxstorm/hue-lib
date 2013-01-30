@@ -12,9 +12,10 @@ RGB_MATRIX = Matrix[
 
 module Hue
 
-  DEVICE_TYPE = "hue-lib"
+  DEVICE_TYPE = 'hue-lib'
   DEFAULT_UDP_TIMEOUT = 2
   ERROR_DEFAULT_EXISTS = 'Default application already registered.'
+  ERROR_NO_BRIDGE_FOUND = 'No bridge found.'
 
   def self.device_type
     DEVICE_TYPE
@@ -24,33 +25,37 @@ module Hue
     Digest::MD5.hexdigest(UUID.generate)
   end
 
-  def self.register_default(host = nil)
-    if app = Hue.application rescue nil
+  def self.register_default
+    if default = (Hue::Config::Application.default rescue nil)
       raise Hue::Error.new(ERROR_DEFAULT_EXISTS)
     else
+      bridge_config = register_bridges.values.first # Assuming one bridge for now
       secret = Hue.one_time_uuid
+      app_config = Hue::Config::Application.new(bridge_config.id, secret)
       puts "Registering app...(#{secret})"
-      config = Hue::Config::Application.new(secret, host)
-      instance = Hue::Bridge.new(config)
+      instance = Hue::Bridge.new(app_config.identifier, bridge_config.uri)
       instance.register
-      config.write
+      app_config.write
       instance
     end
   end
 
   def self.application
     application_config = Hue::Config::Application.default
-    if bridge_config = Hue::Config::Bridge.find(application_config.base_id)
-      Hue::Bridge.new(application_config.identifier, bridge_config.uri)
-    else
-      raise "TODO: handle nil case" #TODO
+    bridge_config = Hue::Config::Bridge.find(application_config.base_id)
+    bridge_config ||= register_bridges[application_config.base_id]
+
+    if bridge_config.nil?
+      raise Error.new("Unable to find bridge: #{application_config.base_id}")
     end
+
+    Hue::Bridge.new(application_config.identifier, bridge_config.uri)
   end
 
   def self.remove_default
     instance = application
     instance.unregister
-    Hue::Config.default.delete
+    Hue::Config::Application.default.delete
     true
   end
 
@@ -75,7 +80,7 @@ ST: ssdp:all
         if message =~ /IpBridge/ && location = /LOCATION: (.*)$/.match(message)
           if uuid = /uuid:(.{36})/.match(message)
             # Assume this is Philips Hue for now.
-            bridges[uuid.captures.first] = ip_add
+            bridges[uuid.captures.first] = "http://#{ip_add}/api"
           end
         end
       end
@@ -88,7 +93,7 @@ ST: ssdp:all
   def self.register_bridges
     bridges = self.discover
     if bridges.empty?
-      raise "No bridge found."
+      raise Error.new(ERROR_NO_BRIDGE_FOUND)
     else
       bridges.inject(Hash.new) do |hash, (id, ip)|
         config = Hue::Config::Bridge.new(id, ip)
