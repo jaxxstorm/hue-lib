@@ -34,9 +34,7 @@ module Hue
           yaml.delete(name)
         end
 
-        if yaml.size > 0
-          dump_yaml(yaml)
-        end
+        dump_yaml(yaml)
       end
 
       def ==(rhs)

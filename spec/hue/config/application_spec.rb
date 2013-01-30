@@ -19,11 +19,17 @@ describe Hue::Config::Application do
   end
 
   context 'with a config file, containing a default' do
+    config = described_class.default
+
     it "should give the default config and report it's values" do
-      config = described_class.default
       config.name == described_class::STRING_DEFAULT
       config.base_id == TEST_CONFIG_APPLICATION[config.name][described_class::STRING_BASE_ID]
       config.identifier == TEST_CONFIG_APPLICATION[config.name][described_class::STRING_IDENTIFIER]
+    end
+
+    it 'should allow deleting the default config from the file' do
+      config.delete
+      YAML.load_file(described_class.file_path)[described_class::STRING_DEFAULT].should be_nil
     end
   end
 
