@@ -42,9 +42,11 @@ module Hue
       private
 
       def add_self_to_yaml(yaml)
-        yaml[name] = {
-          STRING_BASE_ID => self.base_id,
-          STRING_IDENTIFIER => identifier.force_encoding('ASCII') # Avoid binary encoded YAML
+        key = self.name.dup.force_encoding('ASCII') # Avoid binary encoded YAML
+        base = base_id.dup.force_encoding('ASCII')
+        yaml[key] = {
+          STRING_BASE_ID => base,
+          STRING_IDENTIFIER => identifier.force_encoding('ASCII')
         }
       end
 
