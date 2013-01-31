@@ -1,5 +1,6 @@
 require 'socket'
 require 'timeout'
+require 'logger'
 
 module Hue
   class Bridge
@@ -73,50 +74,38 @@ module Hue
     end
 
     def index(url)
-      request = Net::HTTP::Get.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
-      parse_and_check_response(Net::HTTP.new(url.host, url.port).start { |http| http.request(request) })
+      receive(Net::HTTP::Get, url)
     end
 
     def update(url, settings = {})
-      request = Net::HTTP::Put.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
-      request.body = settings.to_json
-      parse_and_check_response(Net::HTTP.new(url.host, url.port).start { |http| http.request(request) })
+      receive(Net::HTTP::Put, url, settings.to_json)
     end
 
     def delete(url, settings = {})
-      request = Net::HTTP::Delete.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
-      request.body = settings.to_json
-      parse_and_check_response(Net::HTTP.new(url.host, url.port).start{ |http| http.request(request) })
+      receive(Net::HTTP::Delete, url, settings.to_json)
     end
 
     def create(url, settings = {})
-      request = Net::HTTP::Post.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
-      request.body = settings.to_json
-      parse_and_check_response(Net::HTTP.new(url.host, url.port).start { |http| http.request(request) })
+      receive(Net::HTTP::Post, url, settings.to_json)
     end
 
-    def parse_and_check_response(response)
-      if display(response)
+    def receive(request_class, url, payload = nil)
+      request = request_class.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
+      request.body = payload if payload
+      Hue.logger.info("Sending #{payload.to_s if payload} to #{url.to_s}")
+      response = Net::HTTP.new(url.host, url.port).start { |http| http.request(request) }
+
+      if response && response.code.to_s != '200'
+        Hue.logger.info("Error with response #{response.code} #{response.message}")
+        raise Hue::Error.new("Unexpected response: #{response.code}, #{response.message}")
+      else
         json = JSON.parse(response.body)
+        Hue.logger.info("Response #{response.code} #{response.message}: #{json}")
         if json.is_a?(Array) && error = json.first['error']
           raise Hue::API::Error.new(error)
         else
           json
         end
-      else
-        raise Hue::Error.new("Unexpected response: #{response.code}, #{response.message}")
-      end
-    end
-
-    def display(response = nil)
-      if response and response.code.to_s != '200'
-        # Output to logger
-        # puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
-        false
-      else
-        # Output to logger
-        # puts "Response #{response.code} #{response.message}: #{JSON.parse(response.body).first}"
-        true
       end
     end
 

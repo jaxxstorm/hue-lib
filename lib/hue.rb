@@ -131,6 +131,25 @@ ST: ssdp:all
     end
   end
 
+  def self.logger
+    if !defined?(@@logger)
+      log_dir_path = File.join('/var', 'log', 'hue')
+      begin
+        FileUtils.mkdir_p(log_dir_path)
+      rescue Errno::EACCES
+        log_dir_path = File.join(ENV['HOME'], '.hue-lib')
+        FileUtils.mkdir_p(log_dir_path)
+      end
+
+      log_file_path = File.join(log_dir_path, 'hue-lib.log')
+      log_file = File.new(log_file_path, File::WRONLY | File::APPEND | File::CREAT)
+      @@logger = Logger.new(log_file)
+      @@logger.level = Logger::INFO
+    end
+
+    @@logger
+  end
+
 end
 
 require 'hue/config/abstract'
