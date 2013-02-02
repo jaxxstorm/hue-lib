@@ -63,7 +63,11 @@ module Hue
     alias :bri :brightness
 
     def brightness=(bri)
-      update(bri: bri)
+      if percentage = /(\d+)%/.match(bri.to_s)
+        update(bri: (percentage.captures.first.to_i / 100.0 * BRIGHTNESS_MAX).round)
+      else
+        update(bri: bri.to_i)
+      end
       brightness
     end
 
@@ -354,8 +358,10 @@ module Hue
 
     def update(settings = {})
       if bridge.set_light_state(id, options.merge(settings))
-        settings.each do |key, value|
-          @status['state'][key.to_s] = value # or refresh!
+        if @status
+          settings.each do |key, value|
+            @status['state'][key.to_s] = value # or refresh!
+          end
         end
       end
     end

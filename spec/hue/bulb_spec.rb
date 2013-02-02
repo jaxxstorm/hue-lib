@@ -77,6 +77,16 @@ describe Hue::Bulb do
         bulb.brightness.should == 233
       end
 
+      it 'should allow setting brightness as a percentage' do
+        with_fake_update('lights/1/state', bri: 128)
+        bulb.brightness = "50%"
+        bulb.brightness.should == 128
+
+        with_fake_update('lights/1/state', bri: 128)
+        bulb.brightness = "128"
+        bulb.brightness.should == 128
+      end
+
       it 'should allow setting blink, solid and flash alerts' do
         with_fake_update('lights/1/state', alert: 'lselect')
         bulb.blink
