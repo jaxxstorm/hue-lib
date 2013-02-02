@@ -93,7 +93,13 @@ module Hue
       request = request_class.new(url.request_uri, initheader = {'Content-Type' =>'application/json'})
       request.body = payload if payload
       Hue.logger.info("Sending #{payload.to_s if payload} to #{url.to_s}")
-      response = Net::HTTP.new(url.host, url.port).start { |http| http.request(request) }
+      response = nil
+      begin
+        response = Net::HTTP.new(url.host, url.port).start { |http| http.request(request) }
+      rescue => err
+        Hue.logger.error(err.message)
+        raise Hue::Error.new("Problem reaching bridge.", err)
+      end
 
       if response && response.code.to_s != '200'
         Hue.logger.info("Error with response #{response.code} #{response.message}")
