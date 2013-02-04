@@ -1,14 +1,7 @@
 require 'net/http'
-require 'json'
-require 'matrix'
 require 'digest/md5'
+require 'json'
 require 'uuid'
-
-RGB_MATRIX = Matrix[
-  [3.233358361244897, -1.5262682428425947, 0.27916711262124544],
-  [-0.8268442148395835, 2.466767560486707, 0.3323241608108406],
-  [0.12942207487871885, 0.19839858329512317, 2.0280912276039635]
-]
 
 module Hue
 
@@ -137,7 +130,7 @@ ST: ssdp:all
       begin
         FileUtils.mkdir_p(log_dir_path)
       rescue Errno::EACCES
-        log_dir_path = File.join(ENV['HOME'], '.hue-lib')
+        log_dir_path = File.join(ENV['HOME'], ".#{device_type}")
         FileUtils.mkdir_p(log_dir_path)
       end
 
@@ -150,10 +143,19 @@ ST: ssdp:all
     @@logger
   end
 
+  def self.percent_to_unit_interval(value)
+    if percentage = /(\d+)%/.match(value.to_s)
+      percentage.captures.first.to_i / 100.0
+    else
+      nil
+    end
+  end
+
 end
 
 require 'hue/config/abstract'
 require 'hue/config/application'
 require 'hue/config/bridge'
 require 'hue/bridge'
+require 'hue/colors'
 require 'hue/bulb'

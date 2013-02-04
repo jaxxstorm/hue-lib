@@ -33,19 +33,18 @@ describe Hue::Bulb do
       bulb.off?.should be_true
     end
 
-    it "should report the hue, brightness and saturation" do
-      bulb.hue.should == 13234
+    it "should report the brightness and color mode" do
       bulb.brightness.should == 146
       bulb.bri.should == 146
-      bulb.saturation.should == 208
-      bulb.sat.should == bulb.saturation
-    end
-
-    it "should report the color temperature and color mode" do
-      bulb.color_temperature.should == 459
-      bulb.ct.should == bulb.color_temperature
       bulb.color_mode.should == 'ct'
       bulb.color_mode.should == bulb.colormode
+    end
+
+    it "should report the color" do
+      color = bulb.color
+      color.should be_a(Hue::Colors::ColorTemperature)
+      color.mired.should == 459
+      color.kelvin.should == 2179
     end
 
     it "should report the alert state" do
@@ -64,23 +63,24 @@ describe Hue::Bulb do
       end
 
       it 'should allow setting hue, saturation and brightness' do
-        with_fake_update('lights/1/state', hue: 21845)
-        bulb.hue = 120
-        bulb.hue.should == 21845
+        color = Hue::Colors::HueSaturation.new(21845, 1293)
 
-        with_fake_update('lights/1/state', sat: 1293)
-        bulb.saturation = 1293
-        bulb.saturation.should == 1293
+        with_fake_update('lights/1/state', colormode: 'hs', hue: 21845, sat: 255)
+        set_color = (bulb.color = color)
+        set_color.hue.should == 21845
+        set_color.saturation.should == 255
+      end
 
+      it 'should allow setting brightness as a number, percentage or string' do
         with_fake_update('lights/1/state', bri: 233)
         bulb.brightness = 233
         bulb.brightness.should == 233
-      end
 
-      it 'should allow setting brightness as a percentage' do
         with_fake_update('lights/1/state', bri: 128)
         bulb.brightness = "50%"
         bulb.brightness.should == 128
+        bulb.brightness_in_unit_interval.should == 0.5019607843137255
+        bulb.brightness_percentage.should == 50
 
         with_fake_update('lights/1/state', bri: 128)
         bulb.brightness = "128"
