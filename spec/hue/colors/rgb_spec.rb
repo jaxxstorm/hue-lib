@@ -17,7 +17,7 @@ describe Hue::Colors::RGB do
     end
 
     it 'should have a hash representation' do
-      color.to_hash.should == {hue: 21845, sat: 127, bri: 1.0 }
+      color.to_hash.should == {hue: 21845, sat: 127, bri: 255 }
     end
 
     it 'should have an RGB representation' do
