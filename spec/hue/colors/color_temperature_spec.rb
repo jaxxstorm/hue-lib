@@ -20,7 +20,7 @@ describe Hue::Colors::ColorTemperature do
     end
 
     it 'should have an RGB representation' do
-      color.to_rgb.should == Hue::Colors::RGB.new(255,137,14)
+      color.to_rgb.should == Hue::Colors::RGB.new(255,136,13)
     end
 
     context 'when allowing change to the temperature value' do
@@ -60,11 +60,10 @@ describe Hue::Colors::ColorTemperature do
         color.mired.should == 307
       end
 
-
     end
   end
 
-  context 'when creating an instance' do
+  context 'when initializing' do
     it 'should set the temperature depending on the value' do
       color = described_class.new(100)
       color.mired.should == described_class::MIRED_MIN
@@ -82,6 +81,14 @@ describe Hue::Colors::ColorTemperature do
     it 'should report kelvins as an integer' do
       color = described_class.new(459)
       color.kelvin.should == 2179
+    end
+
+    it 'should accept a string value for the temperature' do
+      color = described_class.new("100")
+      color.mired.should == described_class::MIRED_MIN
+
+      color = described_class.new((described_class::KELVIN_MAX + 3000).to_s)
+      color.kelvin.should == described_class::KELVIN_MAX
     end
 
     it 'should allow a percentage value for the mired scale' do

@@ -32,7 +32,7 @@ module Hue
       end
 
       def mired=(t)
-        @mired = ranged(MIRED_MIN, t, MIRED_MAX)
+        @mired = ranged(MIRED_MIN, t.to_f, MIRED_MAX)
       end
 
       def kelvin
@@ -40,7 +40,7 @@ module Hue
       end
 
       def kelvin=(t)
-        self.mired = (MEGA / ranged(KELVIN_MIN, t, KELVIN_MAX))
+        self.mired = (MEGA / ranged(KELVIN_MIN, t.to_f, KELVIN_MAX))
       end
 
       def to_hash

@@ -29,7 +29,7 @@ describe Hue::Colors::HueSaturation do
     end
 
     it 'should have an RGB representation' do
-      color.to_rgb.should == Hue::Colors::RGB.new(154,255,133)
+      color.to_rgb.should == Hue::Colors::RGB.new(153,255,132)
     end
 
     context 'when allowing change to the color values' do
@@ -76,6 +76,12 @@ describe Hue::Colors::HueSaturation do
       it 'should accept a hue value with a percentage of the saturation scale' do
         color = described_class.new(7e4, '100%')
         color.hue.should == Hue::Colors::HueSaturation::HUE_MAX
+        color.sat.should == Hue::Colors::HueSaturation::SATURATION_MAX
+      end
+
+      it 'should accept hue and saturation strings' do
+        color = described_class.new("30_000", "1333")
+        color.hue.should == 3e4
         color.sat.should == Hue::Colors::HueSaturation::SATURATION_MAX
       end
     end

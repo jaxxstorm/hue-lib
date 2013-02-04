@@ -50,7 +50,7 @@ module Hue
       protected
 
       def ranged(val)
-        super(MIN, val, MAX).to_f
+        super(MIN, val.to_f, MAX)
       end
 
       private

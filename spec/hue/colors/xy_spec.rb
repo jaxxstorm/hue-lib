@@ -38,6 +38,14 @@ describe Hue::Colors::XY do
         color.y.should == described_class::MIN
       end
     end
+
+    context 'when initializing' do
+      it 'should allow strings' do
+        color = described_class.new('0.22', '10.00')
+        color.x.should == 0.22
+        color.y.should == 1.00
+      end
+    end
   end
 
 end

@@ -24,7 +24,7 @@ module Hue
         if scale = Hue.percent_to_unit_interval(value)
           @hue = unit_to_hue_interval(scale)
         else
-          @hue = ranged(HUE_MIN, value, HUE_MAX).round
+          @hue = ranged(HUE_MIN, value.to_i, HUE_MAX)
         end
       end
 
@@ -40,7 +40,7 @@ module Hue
         if scale = Hue.percent_to_unit_interval(value)
           @saturation = unit_to_saturation_interval(scale)
         else
-          @saturation = ranged(SATURATION_MIN, value, SATURATION_MAX).round
+          @saturation = ranged(SATURATION_MIN, value.to_i, SATURATION_MAX)
         end
       end
       alias :sat= :saturation=

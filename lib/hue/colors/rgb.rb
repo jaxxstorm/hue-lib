@@ -76,7 +76,7 @@ module Hue
       protected
 
       def ranged(value)
-        self.class.ranged(value).round
+        self.class.ranged(value.to_i).round
       end
 
       private

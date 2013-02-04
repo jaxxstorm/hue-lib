@@ -45,6 +45,13 @@ describe Hue::Colors::RGB do
     end
 
     context 'when initializing' do
+      it 'should allow strings' do
+        color = described_class.new('200', '100', '50')
+        color.red.should == 200
+        color.green.should == 100
+        color.blue.should == 50
+      end
+
       it 'should allow percentages' do
         color = described_class.new('10%', '100%', '50%')
         color.red.should == 26
