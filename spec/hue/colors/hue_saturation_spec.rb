@@ -25,7 +25,7 @@ describe Hue::Colors::HueSaturation do
     end
 
     it 'should have a hash representation' do
-      color.to_hash.should == {colormode: 'hs', hue: 20_000, sat: 122}
+      color.to_hash.should == {hue: 20_000, sat: 122}
     end
 
     it 'should have an RGB representation' do

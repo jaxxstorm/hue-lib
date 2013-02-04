@@ -2,7 +2,6 @@ module Hue
   module Colors
     class HueSaturation < Color
 
-      MODE = 'hs'
       HUE_MIN = 0
       HUE_MAX = 65536.0
       HUE_DEGREES = 360
@@ -55,7 +54,7 @@ module Hue
       end
 
       def to_hash
-        {colormode: MODE, hue: hue, sat: saturation}
+        {hue: hue, sat: saturation}
       end
 
       def to_rgb(brightness_in_unit_interval = 1.0)

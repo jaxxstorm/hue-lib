@@ -16,7 +16,7 @@ describe Hue::Colors::ColorTemperature do
     end
 
     it 'should have a hash representation' do
-      color.to_hash.should == {colormode: 'ct', ct: 500}
+      color.to_hash.should == {ct: 500}
     end
 
     it 'should have an RGB representation' do

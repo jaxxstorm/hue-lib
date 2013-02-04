@@ -4,7 +4,6 @@ module Hue
   module Colors
     class ColorTemperature < Color
 
-      MODE = 'ct'
       MEGA = 1e6
       KELVIN_MIN = 2000
       KELVIN_MAX = 6500
@@ -44,7 +43,7 @@ module Hue
       end
 
       def to_hash
-        {colormode: MODE, ct: mired}
+        {ct: mired}
       end
 
       def to_s

@@ -3,7 +3,6 @@ module Hue
   module Colors
     class XY < Color
 
-      MODE = 'xy'
       MIN = 0.0
       MAX = 1.0
       RGB_MATRIX = Matrix[
@@ -30,7 +29,7 @@ module Hue
       end
 
       def to_hash
-        {colormode: MODE, xy: xy}
+        {xy: xy}
       end
 
       def to_s

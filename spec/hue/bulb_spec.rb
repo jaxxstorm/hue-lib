@@ -65,7 +65,7 @@ describe Hue::Bulb do
       it 'should allow setting hue, saturation and brightness' do
         color = Hue::Colors::HueSaturation.new(21845, 1293)
 
-        with_fake_update('lights/1/state', colormode: 'hs', hue: 21845, sat: 255)
+        with_fake_update('lights/1/state', hue: 21845, sat: 255)
         set_color = (bulb.color = color)
         set_color.hue.should == 21845
         set_color.saturation.should == 255

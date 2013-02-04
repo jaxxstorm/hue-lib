@@ -57,7 +57,7 @@ module Hue
             end * 60  # / 6 * 360
 
         h = (h * HueSaturation::HUE_SCALE).to_i
-        {colormode: HueSaturation::MODE, hue: h, sat: s.to_i, bri: 1.0}
+        {hue: h, sat: s.to_i, bri: 1.0}
       end
 
       def to_s
