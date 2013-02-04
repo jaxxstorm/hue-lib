@@ -64,18 +64,19 @@ If you know the ID number of a particular lamp, you can access it directly.
 >> b.on?
 => true
 
-# settings
->> b.settings
-=> {"ct"=>343, "on"=>true, "bri"=>240}
-
+# brightness
 >> b.brightness = 128
 => 128
 
->> b.update hue: 45000, sat: 180
-=> true
+# color
+>> b.color = Hue::Colors::ColorTemperature.new(6500)
+=> Temperature=6500°K (153 mired)
 
->> b.settings
-=> {"hue"=>45000, "sat"=>180, "on"=>true, "bri"=>128}
+>> b.color = Hue::Colors::HueSaturation.new(10_000, 255)
+=> Hue=10000, Saturation=255
+
+>> b.color = Hue::Colors::XY.new(0.5, 0.5)
+=> XY=[0.5, 0.5]
 
 # blinking
 >> b.blinking?

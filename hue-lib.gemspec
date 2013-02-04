@@ -3,12 +3,13 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "hue-lib"
-  s.version     = '0.6.1'
+  s.version     = '0.7.0'
   s.authors     = ["Birkir A. Barkarson", "Aaron Hurley"]
   s.email       = ["birkirb@stoicviking.net"]
   s.homepage    = "https://github.com/birkirb/hue-lib"
-  s.summary     = %q{Ruby library for controlling Phillips Hue light bridge.}
-  s.description = s.summary
+  s.summary     = %q{Ruby library for controlling the Philips Hue system's lights and bridge.}
+  s.description = %q{Library allowing registration and invocation of a registered Philips Hue app.
+    Convinient objects allow executing commands on the bridge or individual bulbs.}
 
   s.rubyforge_project = "hue-lib"
 
