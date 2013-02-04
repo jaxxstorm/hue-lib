@@ -80,7 +80,7 @@ describe Hue::Bulb do
         bulb.brightness = "50%"
         bulb.brightness.should == 128
         bulb.brightness_in_unit_interval.should == 0.5019607843137255
-        bulb.brightness_percentage.should == 50
+        bulb.brightness_percent.should == 50
 
         with_fake_update('lights/1/state', bri: 128)
         bulb.brightness = "128"

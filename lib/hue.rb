@@ -144,8 +144,8 @@ ST: ssdp:all
   end
 
   def self.percent_to_unit_interval(value)
-    if percentage = /(\d+)%/.match(value.to_s)
-      percentage.captures.first.to_i / 100.0
+    if percent = /(\d+)%/.match(value.to_s)
+      percent.captures.first.to_i / 100.0
     else
       nil
     end

@@ -79,7 +79,7 @@ module Hue
       brightness / BRIGHTNESS_MAX.to_f
     end
 
-    def brightness_percentage
+    def brightness_percent
       (brightness_in_unit_interval * 100).round
     end
 

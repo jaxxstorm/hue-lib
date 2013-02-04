@@ -78,7 +78,7 @@ describe Hue do
   end
 
   context 'contains some utility methods' do
-    it '#percent_to_unit_interval should convert a string with percentage to a unit interval' do
+    it '#percent_to_unit_interval should convert a string with percent to a unit interval' do
       described_class.percent_to_unit_interval('1%').should == 0.01
       described_class.percent_to_unit_interval('10%').should == 0.1
       described_class.percent_to_unit_interval('100%').should == 1.00
