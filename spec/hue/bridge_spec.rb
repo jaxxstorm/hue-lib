@@ -50,6 +50,11 @@ describe Hue::Bridge do
       with_fake_delete("config/whitelist/#{TEST_APPLICATION_UUID}")
       bridge.unregister
     end
+
+    it 'should allow scanning for new lights' do
+      with_fake_post("#{TEST_APPLICATION_UUID}/lights")
+      bridge.add_lights
+    end
   end
 
   context 'when instantiated with a new config' do

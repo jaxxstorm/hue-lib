@@ -18,6 +18,10 @@ module Hue
       index(uri)
     end
 
+    def add_lights
+      create(uri('lights'))
+    end
+
     def lights
       index(uri('lights'))
     end
