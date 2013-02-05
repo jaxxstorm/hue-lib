@@ -21,7 +21,7 @@ module Hue
     end
 
     def refresh!
-      @status = bridge.get_light_state(id)
+      @status = bridge.get_light(id)
     end
 
     def info
@@ -55,12 +55,12 @@ module Hue
     end
 
     def on
-      update(on: true)
+      update_state(on: true)
       on?
     end
 
     def off
-      update(on: false)
+      update_state(on: false)
       off?
     end
 
@@ -72,9 +72,9 @@ module Hue
 
     def brightness=(bri)
       if scale = Hue.percent_to_unit_interval(bri)
-        update(bri: (scale * BRIGHTNESS_MAX).round)
+        update_state(bri: (scale * BRIGHTNESS_MAX).round)
       else
-        update(bri: bri.to_i)
+        update_state(bri: bri.to_i)
       end
       brightness
     end
@@ -100,7 +100,7 @@ module Hue
     end
 
     def color=(col)
-      update(col.to_hash)
+      update_state(col.to_hash)
       set_color
     end
 
@@ -113,16 +113,17 @@ module Hue
     end
 
     def blink
-      update(alert: 'lselect')
+      update_state(alert: 'lselect')
     end
 
     def solid
-      update(alert: 'none')
+      update_state(alert: 'none')
     end
 
     def flash
-      update(alert: 'select')
-      update(alert: 'none')
+      update_state(alert: 'select')
+      # immediately update to expected state
+      @status['state']['alert'] = 'none'
     end
 
     def transition_time
@@ -145,12 +146,23 @@ module Hue
       @color = Colors.parse_state(state)
     end
 
-    def update(settings = {})
+    def update_state(settings = {})
       if bridge.set_light_state(id, options.merge(settings))
-        if @status
-          settings.each do |key, value|
-            @status['state'][key.to_s] = value # or refresh!
-          end
+        set_status(settings, 'state')
+      end
+    end
+
+    def update(settings = {})
+      if bridge.set_light(id, settings)
+        set_status(settings)
+      end
+    end
+
+    def set_status(settings, key = nil)
+      if @status
+        status = key ? @status[key] : @status
+        settings.each do |key, value|
+          status[key.to_s] = value
         end
       end
     end

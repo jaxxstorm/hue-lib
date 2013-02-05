@@ -39,7 +39,6 @@ module Hue
     end
 
     def bulbs
-      # puts status['lights'].inspect
       @bulbs ||= lights.keys.map { |b| Bulb.new(self, b) }
     end
 
@@ -54,14 +53,6 @@ module Hue
     #   ids.each{|x| remove_schedule x}
     # end
 
-    def get_light_state(id)
-      index(uri('lights', id))
-    end
-
-    def set_light_state(id, state)
-      update(uri('lights', id, 'state'), state)
-    end
-
     def register
       create(URI.parse(bridge_uri),
              {"username" => application_id, "devicetype" => Hue.device_type})
@@ -69,6 +60,18 @@ module Hue
 
     def unregister
       delete(uri('config', 'whitelist', application_id))
+    end
+
+    def get_light(id)
+      index(uri('lights', id))
+    end
+
+    def set_light(id, property)
+      update(uri('lights', id), property)
+    end
+
+    def set_light_state(id, state)
+      update(uri('lights', id, 'state'), state)
     end
 
     private
