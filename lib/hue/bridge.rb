@@ -102,7 +102,10 @@ module Hue
       Hue.logger.info("Sending #{payload.to_s if payload} to #{url.to_s}")
       response = nil
       begin
-        response = Net::HTTP.new(url.host, url.port).start { |http| http.request(request) }
+        http = Net::HTTP.new(url.host, url.port)
+        http.open_timeout = 3  # Quick timeout on connection fail.
+        http.read_timeout = 7 # Slower timeout on read fail, but way faster than the default.
+        response = http.start { |http| http.request(request) }
       rescue => err
         Hue.logger.error(err.message)
         raise Hue::Error.new("Problem reaching bridge.", err)
