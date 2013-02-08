@@ -62,6 +62,12 @@ describe Hue::Bulb do
         bulb.off.should be_true
       end
 
+      it 'should allow changing the name' do
+        with_fake_update('lights/1', name: 'New name')
+        bulb.name = 'New name'
+        bulb.name.should == 'New name'
+      end
+
       it 'should allow setting hue, saturation and brightness' do
         color = Hue::Colors::HueSaturation.new(21845, 1293)
 

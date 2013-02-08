@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "hue-lib"
-  s.version     = '0.7.0'
+  s.version     = '0.7.1'
   s.authors     = ["Birkir A. Barkarson", "Aaron Hurley"]
   s.email       = ["birkirb@stoicviking.net"]
   s.homepage    = "https://github.com/birkirb/hue-lib"
