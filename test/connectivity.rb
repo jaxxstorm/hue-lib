@@ -36,6 +36,7 @@ while(@run)
     puts err.message
     @error_count += 1
   end
+  sleep 1
 end
 
 puts "Command count: #{@command_count}"
