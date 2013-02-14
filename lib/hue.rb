@@ -71,10 +71,16 @@ ST: ssdp:all
       loop do
         message, (address_family, port, hostname, ip_add) = socket.recvfrom(1024)
         if message =~ /IpBridge/ && location = /LOCATION: (.*)$/.match(message)
-          if uuid = /uuid:(.{36})/.match(message)
+          if uuid_match = /uuid:(.{36})/.match(message)
             # Assume this is Philips Hue for now.
-            bridges[uuid.captures.first] = "http://#{ip_add}/api"
+            uuid = uuid_match.captures.first
+            if bridges[uuid].nil?
+              logger.info("Found bridge (#{hostname}:#{port}) with uuid: #{uuid}")
+            end
+            bridges[uuid] = "http://#{ip_add}/api"
           end
+        else
+          logger.debug("Found #{hostname}:#{port}: #{message}")
         end
       end
     end

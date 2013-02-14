@@ -36,6 +36,7 @@ def silence_warnings
 end
 
 SPEC_DIR = File.dirname(__FILE__)
+Hue.logger.level = Logger::DEBUG
 
 silence_warnings do
   Hue.const_set(:DEFAULT_UDP_TIMEOUT, 0.01)
