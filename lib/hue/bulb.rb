@@ -5,6 +5,8 @@ module Hue
   class Bulb
 
     BRIGHTNESS_MAX = 255
+    NONE = 'none'
+    COLOR_LOOP = 'colorloop'
 
     include Animations::Candle
     include Animations::Sunrise
@@ -104,36 +106,68 @@ module Hue
       set_color
     end
 
+    def effect
+      self['effect']
+    end
+
+    def effect=(value)
+      update_state(effect: value.to_s)
+    end
+
+    def effect?
+      NONE != self.effect
+    end
+
+    def color_loop
+      self.effect = COLOR_LOOP
+    end
+    alias :colorloop :color_loop
+
+    def color_loop?
+      COLOR_LOOP == self.effect
+    end
+
+    def clear_effect
+      self.effect = NONE
+    end
+
+    def alert
+      self['alert']
+    end
+
+    def alert=(value)
+      update_state(alert: value.to_s)
+    end
+
     def blinking?
       !solid?
     end
 
     def solid?
-      'none' == self['alert']
+      NONE == alert
     end
 
     def blink
-      update_state(alert: 'lselect')
+      self.alert = 'lselect'
     end
 
     def solid
-      update_state(alert: 'none')
+      self.alert = NONE
     end
 
     def flash
-      update_state(alert: 'select')
+      self.alert = 'select'
       # immediately update to expected state
-      @status['state']['alert'] = 'none'
+      @status['state']['alert'] = NONE
     end
 
+    # transition time in seconds
     def transition_time
-      # transition time in seconds
-      (options[:transitiontime] || 1).to_f / 10
+      (options[:transitiontime] || 0).to_f / 10
     end
 
     def transition_time=(time)
-      # transition time in seconds
-      self.options[:transitiontime] = (time * 10).to_i
+      self.options[:transitiontime] = (time.to_f * 10).to_i
     end
 
     private

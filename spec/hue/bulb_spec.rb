@@ -48,8 +48,19 @@ describe Hue::Bulb do
     end
 
     it "should report the alert state" do
+      bulb.alert.should == 'none'
       bulb.blinking?.should be_false
       bulb.solid?.should be_true
+    end
+
+    it "should report the effect state" do
+      bulb.effect?.should be_false
+      bulb.effect.should == 'none'
+      bulb.color_loop?.should be_false
+    end
+
+    it "should report the transition time" do
+      bulb.transition_time.should == 0
     end
 
     context 'by changing state' do
@@ -107,6 +118,38 @@ describe Hue::Bulb do
           bulb.flash
           bulb.solid?.should be_true
         end
+
+        with_fake_update('lights/1/state', alert: 'crap') do
+          bulb.alert = 'crap'
+        end
+      end
+
+      it 'should allow setting colorloop, and effect' do
+        with_fake_update('lights/1/state', effect: 'new')
+        bulb.effect = 'new'
+        bulb.effect.should == 'new'
+        bulb.effect?.should be_true
+
+        with_fake_update('lights/1/state', effect: 'colorloop')
+        bulb.colorloop
+        bulb.effect.should == 'colorloop'
+        bulb.effect?.should be_true
+        bulb.color_loop?.should be_true
+
+        with_fake_update('lights/1/state', effect: 'none')
+        bulb.clear_effect
+        bulb.effect.should == 'none'
+
+        with_fake_update('lights/1/state', effect: 'colorloop')
+        bulb.color_loop
+        bulb.effect.should == 'colorloop'
+      end
+
+      it 'should allow setting the transitions time, and employ it for a state change' do
+        bulb.transition_time = 10
+
+        with_fake_update('lights/1/state', transitiontime: 100, bri: 255)
+        bulb.brightness = 255
       end
 
     end
