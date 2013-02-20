@@ -36,6 +36,11 @@ module Hue
       status['state']
     end
 
+    # Free for all, no checking.
+    def state=(value)
+      update_state(value)
+    end
+
     def [](item)
       state[item.to_s]
     end
