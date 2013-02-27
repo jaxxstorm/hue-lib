@@ -30,7 +30,7 @@ module Hue
           end
         end
         steps.each_with_index do |step, i|
-          update step.merge(on: true)
+          update step.merge(:on => true)
           sleep(step[:transitiontime] / 10.0)
         end
       end
@@ -45,7 +45,7 @@ module Hue
           end
         end
         steps.each_with_index do |step, i|
-          update step.merge(on: true)
+          update step.merge(:on => true)
           sleep(step[:transitiontime] / 10.0)
         end
         off
@@ -85,7 +85,7 @@ module Hue
 
         steps = []
         sunrise_times.each_with_index do |t, i|
-          steps << {bri: bri_steps[i], ct: tmp_steps[i], transitiontime: (t * multiplier)}
+          steps << {:bri => bri_steps[i], :ct => tmp_steps[i], :transitiontime => (t * multiplier)}
         end
         steps
       end
@@ -96,7 +96,7 @@ module Hue
 
         steps = []
         sunset_times.each_with_index do |t, i|
-          steps << {bri: bri_steps[i], ct: tmp_steps[i], transitiontime: (t * multiplier)}
+          steps << {:bri => bri_steps[i], :ct => tmp_steps[i], :transitiontime => (t * multiplier)}
         end
         steps
       end

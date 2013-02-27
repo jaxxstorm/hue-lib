@@ -1,5 +1,5 @@
-require_relative 'animations/candle'
-require_relative 'animations/sunrise'
+require 'hue/animations/candle'
+require 'hue/animations/sunrise'
 
 module Hue
   class Bulb
@@ -50,7 +50,7 @@ module Hue
     end
 
     def name=(_name)
-      update(name: _name)
+      update(:name => _name)
     end
 
     def on?
@@ -62,12 +62,12 @@ module Hue
     end
 
     def on
-      update_state(on: true)
+      update_state(:on => true)
       on?
     end
 
     def off
-      update_state(on: false)
+      update_state(:on => false)
       off?
     end
 
@@ -79,9 +79,9 @@ module Hue
 
     def brightness=(bri)
       if scale = Hue.percent_to_unit_interval(bri)
-        update_state(bri: (scale * BRIGHTNESS_MAX).round)
+        update_state(:bri => (scale * BRIGHTNESS_MAX).round)
       else
-        update_state(bri: bri.to_i)
+        update_state(:bri => bri.to_i)
       end
       brightness
     end
@@ -116,7 +116,7 @@ module Hue
     end
 
     def effect=(value)
-      update_state(effect: value.to_s)
+      update_state(:effect => value.to_s)
     end
 
     def effect?
@@ -141,7 +141,7 @@ module Hue
     end
 
     def alert=(value)
-      update_state(alert: value.to_s)
+      update_state(:alert => value.to_s)
     end
 
     def blinking?

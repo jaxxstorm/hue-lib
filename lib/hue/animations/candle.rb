@@ -15,7 +15,7 @@ module Hue
           bri = rand(32) + 16
 
           delay = (rand * 0.35) + (@delay ||= 0)
-          update(hue: hue, sat: sat, bri: bri, transitiontime: (delay * 10).to_i)
+          update(:hue => hue, :sat => sat, :bri => bri, :transitiontime => (delay * 10).to_i)
           sleep delay
         end
         restore!

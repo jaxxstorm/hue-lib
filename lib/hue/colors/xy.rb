@@ -29,7 +29,7 @@ module Hue
       end
 
       def to_hash
-        {xy: xy}
+        {:xy => xy}
       end
 
       def to_s

@@ -1,8 +1,8 @@
-require_relative 'colors/color'
-require_relative 'colors/hue_saturation'
-require_relative 'colors/color_temperature'
-require_relative 'colors/xy'
-require_relative 'colors/rgb'
+require 'hue/colors/color'
+require 'hue/colors/hue_saturation'
+require 'hue/colors/color_temperature'
+require 'hue/colors/xy'
+require 'hue/colors/rgb'
 
 module Hue
   module Colors

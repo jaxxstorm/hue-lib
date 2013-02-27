@@ -57,7 +57,7 @@ module Hue
             end * 60  # / 6 * 360
 
         h = (h * HueSaturation::HUE_SCALE).to_i
-        {hue: h, sat: s.to_i, bri: Bulb::BRIGHTNESS_MAX}
+        {:hue => h, :sat => s.to_i, :bri => Bulb::BRIGHTNESS_MAX}
       end
 
       def to_s

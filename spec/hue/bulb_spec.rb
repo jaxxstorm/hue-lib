@@ -66,15 +66,15 @@ describe Hue::Bulb do
     context 'by changing state' do
 
       it 'should allow turning bulps on and off' do
-        with_fake_update('lights/1/state', on: true)
+        with_fake_update('lights/1/state', :on => true)
         bulb.on.should be_true
 
-        with_fake_update('lights/1/state', on: false)
+        with_fake_update('lights/1/state', :on => false)
         bulb.off.should be_true
       end
 
       it 'should allow changing the name' do
-        with_fake_update('lights/1', name: 'New name')
+        with_fake_update('lights/1', :name => 'New name')
         bulb.name = 'New name'
         bulb.name.should == 'New name'
       end
@@ -82,65 +82,65 @@ describe Hue::Bulb do
       it 'should allow setting hue, saturation and brightness' do
         color = Hue::Colors::HueSaturation.new(21845, 1293)
 
-        with_fake_update('lights/1/state', hue: 21845, sat: 255)
+        with_fake_update('lights/1/state', :hue => 21845, :sat => 255)
         set_color = (bulb.color = color)
         set_color.hue.should == 21845
         set_color.saturation.should == 255
       end
 
       it 'should allow setting brightness as a number, percentage or string' do
-        with_fake_update('lights/1/state', bri: 233)
+        with_fake_update('lights/1/state', :bri => 233)
         bulb.brightness = 233
         bulb.brightness.should == 233
 
-        with_fake_update('lights/1/state', bri: 128)
+        with_fake_update('lights/1/state', :bri => 128)
         bulb.brightness = "50%"
         bulb.brightness.should == 128
         bulb.brightness_in_unit_interval.should == 0.5019607843137255
         bulb.brightness_percent.should == 50
 
-        with_fake_update('lights/1/state', bri: 128)
+        with_fake_update('lights/1/state', :bri => 128)
         bulb.brightness = "128"
         bulb.brightness.should == 128
       end
 
       it 'should allow setting blink, solid and flash alerts' do
-        with_fake_update('lights/1/state', alert: 'lselect')
+        with_fake_update('lights/1/state', :alert => 'lselect')
         bulb.blink
         bulb.blinking?.should be_true
 
-        with_fake_update('lights/1/state', alert: 'none')
+        with_fake_update('lights/1/state', :alert => 'none')
         bulb.solid
         bulb.solid?.should be_true
 
-        with_fake_update('lights/1/state', alert: 'select') do
-          with_fake_update('lights/1/state', alert: 'none')
+        with_fake_update('lights/1/state', :alert => 'select') do
+          with_fake_update('lights/1/state', :alert => 'none')
           bulb.flash
           bulb.solid?.should be_true
         end
 
-        with_fake_update('lights/1/state', alert: 'crap') do
+        with_fake_update('lights/1/state', :alert => 'crap') do
           bulb.alert = 'crap'
         end
       end
 
       it 'should allow setting colorloop, and effect' do
-        with_fake_update('lights/1/state', effect: 'new')
+        with_fake_update('lights/1/state', :effect => 'new')
         bulb.effect = 'new'
         bulb.effect.should == 'new'
         bulb.effect?.should be_true
 
-        with_fake_update('lights/1/state', effect: 'colorloop')
+        with_fake_update('lights/1/state', :effect => 'colorloop')
         bulb.colorloop
         bulb.effect.should == 'colorloop'
         bulb.effect?.should be_true
         bulb.color_loop?.should be_true
 
-        with_fake_update('lights/1/state', effect: 'none')
+        with_fake_update('lights/1/state', :effect => 'none')
         bulb.clear_effect
         bulb.effect.should == 'none'
 
-        with_fake_update('lights/1/state', effect: 'colorloop')
+        with_fake_update('lights/1/state', :effect => 'colorloop')
         bulb.color_loop
         bulb.effect.should == 'colorloop'
       end
@@ -148,7 +148,7 @@ describe Hue::Bulb do
       it 'should allow setting the transitions time, and employ it for a state change' do
         bulb.transition_time = 10
 
-        with_fake_update('lights/1/state', transitiontime: 100, bri: 255)
+        with_fake_update('lights/1/state', :transitiontime => 100, :bri => 255)
         bulb.brightness = 255
       end
 

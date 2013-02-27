@@ -22,4 +22,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency("rspec", '>= 2.6.0')
   s.add_development_dependency("mocha", '>= 0.9.0')
   s.add_development_dependency("webmock", '>= 1.8.0')
+
+  if RUBY_VERSION < "1.9"
+    s.add_runtime_dependency("uuid")
+    s.add_runtime_dependency("backports")
+  end
 end

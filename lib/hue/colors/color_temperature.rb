@@ -43,7 +43,7 @@ module Hue
       end
 
       def to_hash
-        {ct: mired}
+        {:ct => mired}
       end
 
       def to_s

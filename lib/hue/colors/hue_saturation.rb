@@ -54,7 +54,7 @@ module Hue
       end
 
       def to_hash
-        {hue: hue, sat: saturation}
+        {:hue => hue, :sat => saturation}
       end
 
       def to_rgb(brightness_in_unit_interval = 1.0)
