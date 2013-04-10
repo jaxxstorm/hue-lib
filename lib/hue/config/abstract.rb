@@ -57,7 +57,7 @@ module Hue
 
       def self.setup_file_path(path)
         dir = File.dirname(path)
-        FileUtils.mkdir_p(dir) unless Dir.exists?(dir)
+        FileUtils.mkdir_p(dir) unless File.exists?(dir)
       end
 
       def self.read_file(config_file)

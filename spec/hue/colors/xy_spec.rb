@@ -16,7 +16,7 @@ describe Hue::Colors::XY do
     end
 
     it 'should have a hash representation' do
-      color.to_hash.should == {xy: [0.5, 0.5]}
+      color.to_hash.should == {:xy => [0.5, 0.5]}
     end
 
     it 'should have an RGB representation' do
