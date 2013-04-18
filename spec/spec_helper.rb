@@ -44,6 +44,7 @@ end
 
 # APPLICATION CONFIG
 
+EMPTY_CONFIG_FILE = File.join(SPEC_DIR, 'config', 'empty.yml')
 TEST_CONFIG_APPLICATION_PATH = File.join(SPEC_DIR, 'config', 'applications.yml')
 TEST_CONFIG_APPLICATION = YAML.load_file(TEST_CONFIG_APPLICATION_PATH)
 TEST_JSON_DATA_PATH = File.join(SPEC_DIR, 'json')

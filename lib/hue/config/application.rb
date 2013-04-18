@@ -16,7 +16,7 @@ module Hue
 
       def self.named(name)
         yaml = read_file(file_path)
-        if named_yaml = yaml[name]
+        if yaml && named_yaml = yaml[name]
           new(named_yaml[STRING_BRIDGE_ID], named_yaml[STRING_ID], name)
         else
           raise NotFound.new("Config named '#{name}' not found.")

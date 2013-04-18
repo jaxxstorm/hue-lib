@@ -58,4 +58,15 @@ describe Hue::Config::Application do
     end
   end
 
+  context 'given an non existing config' do
+
+    it "should throw and error if a named config doesn't exist" do
+      described_class.expects(:file_path).returns(EMPTY_CONFIG_FILE).once
+
+      lambda do
+        described_class.named('not_default')
+      end.should raise_error(Hue::Config::NotFound, /Config named (.*) not found/)
+    end
+  end
+
 end

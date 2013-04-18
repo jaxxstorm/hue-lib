@@ -33,7 +33,6 @@ describe Hue::Config::Abstract do
   end
 
   context 'given an existing config' do
-    EMPTY_CONFIG_FILE = File.join(SPEC_DIR, 'config', 'empty.yml')
     config = described_class.new('test', EMPTY_CONFIG_FILE)
 
     it 'should allow writing to the file' do
