@@ -32,4 +32,15 @@ describe Hue::Config::Abstract do
     end
   end
 
+  context 'given an existing config' do
+    EMPTY_CONFIG_FILE = File.join(SPEC_DIR, 'config', 'empty.yml')
+    config = described_class.new('test', EMPTY_CONFIG_FILE)
+
+    it 'should allow writing to the file' do
+      config.write
+      YAML.load_file(config.path)['test'].should be_a(Hash)
+      config.delete
+    end
+  end
+
 end

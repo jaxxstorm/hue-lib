@@ -18,7 +18,9 @@ module Hue
       end
 
       def write(overwrite_existing_key = false)
-        yaml = YAML.load_file(self.path) rescue Hash.new
+        yaml = YAML.load_file(self.path) rescue nil
+        yaml ||= Hash.new
+
         if yaml.key?(name) && !overwrite_existing_key
           raise "Key named '#{name}' already exists in config file '#{self.path}'.\nPlease remove it before creating a new one with the same name."
         else
