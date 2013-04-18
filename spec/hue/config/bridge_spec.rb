@@ -21,7 +21,7 @@ describe Hue::Config::Bridge do
   end
 
   context 'given an new config' do
-    uuid = UUID.generate
+    uuid = Hue.one_time_uuid
     uri = 'http://someip/api'
     config = described_class.new(uuid, uri)
 
