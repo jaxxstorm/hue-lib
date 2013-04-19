@@ -104,7 +104,7 @@ module Hue
       begin
         http = Net::HTTP.new(url.host, url.port)
         http.open_timeout = 3  # Quick timeout on connection fail.
-        http.read_timeout = 7 # Slower timeout on read fail, but way faster than the default.
+        http.read_timeout = 8 # Slower timeout on read fail, but way faster than the default.
         response = http.start { |http| http.request(request) }
       rescue => err
         Hue.logger.error(err.message)
