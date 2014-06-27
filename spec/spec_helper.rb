@@ -107,6 +107,20 @@ def mock_udp_replies(uuid = TEST_UDP_BRIDGE_UUID, hostname = TEST_UDP_BRIDGE_HOS
   UDPSocket.stubs(:new).returns(socket)
 end
 
+def mock_udp_no_reply
+  socket = Object.new
+  socket.stubs(:send).returns(nil)
+  socket.instance_eval do
+    def recvfrom(args)
+      while(true) do
+        # Waiting for timeout.
+      end
+    end
+  end
+  UDPSocket.stubs(:new).returns(socket)
+end
+
+
 # BRIDGE - API CALLS
 
 TEST_BRIDGE_URI = 'http://localhost/api'

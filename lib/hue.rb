@@ -18,7 +18,7 @@ module Hue
   end
 
   def self.register_default
-    if default = (Hue::Config::Application.default rescue nil)
+    if (Hue::Config::Application.default rescue nil)
       raise Hue::Error.new(ERROR_DEFAULT_EXISTS)
     else
       bridge_config = register_bridges.values.first # Assuming one bridge for now
@@ -85,6 +85,7 @@ ST: ssdp:all
     end
 
   rescue Hue::Error
+    logger.info("UDPSocket timed out.")
     bridges
   end
 

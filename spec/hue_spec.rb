@@ -1,7 +1,6 @@
 require 'spec_helper.rb'
 
 describe Hue do
-
   mock_application_config_path
   mock_bridge_config_path
 
@@ -21,7 +20,7 @@ describe Hue do
     described_class.application.should be_a(described_class::Bridge)
   end
 
-  context 'when discovering new bridges' do
+  context 'when discovering a bridge on the network' do
     it 'should return a list discovered bridges' do
       bridges = Hue.discover
       bridges.should == {TEST_UDP_BRIDGE_UUID => TEST_UDP_BRIDGE_URI}
@@ -33,6 +32,17 @@ describe Hue do
       new_bridge = registered[TEST_UDP_BRIDGE_UUID]
       new_bridge.id.should == TEST_UDP_BRIDGE_UUID
       new_bridge.uri.should == TEST_UDP_BRIDGE_URI
+    end
+  end
+
+  context 'when attempting discover without a bridge on the network' do
+    before(:each) do
+      mock_udp_no_reply
+    end
+
+    it 'should return an empty list of bridges' do
+      bridges = Hue.discover
+      bridges.should == {}
     end
   end
 
@@ -64,7 +74,7 @@ describe Hue do
       with_temp_config_path do
         with_fake_post(nil, {}, 'post_success', TEST_UDP_BRIDGE_URI)
         with_stdout(/Registering app...(.*)$/) do
-          instance = described_class.register_default
+          described_class.register_default
         end
       end
     end
@@ -72,7 +82,7 @@ describe Hue do
     it 'should allow un-registering the default' do
       with_temp_config_path(true) do
         with_fake_delete("config/whitelist/#{TEST_APPLICATION_UUID}")
-        instance = described_class.remove_default
+        described_class.remove_default
       end
     end
   end
