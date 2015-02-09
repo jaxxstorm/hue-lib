@@ -34,7 +34,7 @@ module Hue
       when 'hs'
         Colors::HueSaturation.new(state['hue'], state['sat'])
       else
-        raise Error.new("Unknown or missing state: #{state.inspect}")
+        "Colors not supported - Hue Lux?"
       end
     end
 
